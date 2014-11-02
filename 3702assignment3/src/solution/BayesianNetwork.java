@@ -127,9 +127,15 @@ public class BayesianNetwork {
 		ArrayList<Node> trueList = new ArrayList<Node>();
 		// Add the node and its parents to our list to check
 		trueList.add(node);
-		// TODO get parent node from string
-		trueList.addAll(node.getParents());
 		
+		// Get parent node from string
+		ArrayList<String> parents = node.getParents();
+		for(int i = 0; i < parents.size(); i++) {
+			// Add this node to our list of trues
+			trueList.add(getNodeByName(parents.get(i)));
+		}
+		
+		// Get the amount of rows where the above list is all true
 		int trueCount = getTruthCount(trueList, null);
 		
 		// Get total amount of data.
@@ -141,7 +147,7 @@ public class BayesianNetwork {
 			trueCount++;
 		}
 		
-		// TODO divide A by B to get probability
+		// divide to get probability
 		double probability = trueCount / dataLength;
 		
 		// Return probability
