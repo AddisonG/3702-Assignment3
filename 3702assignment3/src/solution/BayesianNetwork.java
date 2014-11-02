@@ -24,8 +24,9 @@ public class BayesianNetwork {
 	
 	
 	
-	public BayesianNetwork() {
-		data = new ArrayList<ArrayList<Boolean>>();
+	public BayesianNetwork(ArrayList<Node> nodes, ArrayList<ArrayList<Boolean>> data) {
+		this.data = data;
+		this.nodes = nodes;
 	}
 	
 	
@@ -126,6 +127,7 @@ public class BayesianNetwork {
 		ArrayList<Node> trueList = new ArrayList<Node>();
 		// Add the node and its parents to our list to check
 		trueList.add(node);
+		// TODO get parent node from string
 		trueList.addAll(node.getParents());
 		
 		int trueCount = getTruthCount(trueList, null);

@@ -16,16 +16,19 @@ public class Node {
 	/** The name of this node **/
 	private String name; 
 	
+	// TODO set this to strings
 	/** The list of parents of this node **/
-	private ArrayList<Node> parents;
+	private ArrayList<String> parents;
 	
 	
 	/**
 	 * Constructor for node
 	 */
-	public Node() {
-		// Initialize array lists
-		parents = new ArrayList<Node>();
+	public Node(String name, ArrayList<String> parents) {
+		// Copy parent list as this parent list
+		this.parents = new ArrayList<String>();
+		this.parents.addAll(parents);
+		this.name = name;
 	}
 	
 	
@@ -34,7 +37,7 @@ public class Node {
 	 * 
 	 * @param parent - the new parent to add
 	 */
-	public void addParent(Node parent) {
+	public void addParent(String parent) {
 		// Check given Node is not already a parent
 		if(!parents.contains(parent)) {
 			parents.add(parent);
@@ -47,7 +50,7 @@ public class Node {
 	 * 
 	 * @return	- list of nodes which are parents
 	 */
-	public ArrayList<Node> getParents() {
+	public ArrayList<String> getParents() {
 		return parents;
 	}
 	
