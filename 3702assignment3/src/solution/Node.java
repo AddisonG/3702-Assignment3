@@ -1,6 +1,3 @@
-/**
- * 
- */
 package solution;
 
 import java.util.ArrayList;
@@ -27,18 +24,6 @@ public class Node {
 	 */
 	public Node(String name) {
 		this.name = name;
-		parents = new ArrayList<Node>();
-	}
-	
-	/**
-	 * Node constructor.
-	 * 
-	 * @param name - Name of node
-	 * @param index - Index of node
-	 */
-	public Node(String name, int index) {
-		this.name = name;
-		this.index = index;
 		parents = new ArrayList<Node>();
 	}
 	

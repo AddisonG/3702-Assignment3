@@ -1,6 +1,3 @@
-/**
- * 
- */
 package solution;
 
 import java.io.BufferedReader;
@@ -19,11 +16,7 @@ import java.util.Scanner;
  * 
  * @author Cameron Darragh<br>Addison Gourluck
  */
-public class Reader {
-	public final static int ERROR = 0; // Nothing except critical errors
-	public final static int INFO = 1; // Only important information
-	public final static int DEBUG = 2; // Absolutely everything
-	
+public class Reader extends Global {
 	public final static int MODE = DEBUG; // Current debug mode
 	
 	/**
@@ -101,13 +94,9 @@ public class Reader {
 			log(DEBUG, "\nAdding: " + name);
 			// Create or set current node, and its index
 			Node current;
-			if (nodes.containsKey(name)) {
-				current = nodes.get(name);
-				current.setIndex(i);
-			} else {
-				nodes.put(name, new Node(name, i));
-				current = nodes.get(name);
-			}
+			nodes.putIfAbsent(name, new Node(name));
+			current = nodes.get(name);
+			current.setIndex(i);
 			
 			// Add parents
 			while (s.hasNext()) {
@@ -139,11 +128,5 @@ public class Reader {
 		
 		// Create Bayesian Network
 		return new BayesianNetwork(nodes, data);
-	}
-	
-	private static void log(int mode, String str) {
-		if (DEBUG >= mode) {
-			System.out.println(str);
-		}
 	}
 }

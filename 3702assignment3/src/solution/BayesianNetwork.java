@@ -1,6 +1,3 @@
-/**
- * 
- */
 package solution;
 
 import java.util.ArrayList;
@@ -13,7 +10,8 @@ import java.util.Map;
  * 
  * @author Cameron Darragh<br>Addison Gourluck
  */
-public class BayesianNetwork {
+public class BayesianNetwork extends Global {
+	public final static int MODE = DEBUG; // Current debug mode
 	
 	/** The list of nodes in this network **/
 	private Map<String, Node> nodes;
@@ -25,6 +23,13 @@ public class BayesianNetwork {
 	public BayesianNetwork(Map<String, Node> nodes, List<Boolean[]> data) {
 		this.data = data;
 		this.nodes = nodes;
+	}
+	
+	/**
+	 * @return All of the nodes within this Bayesian Network
+	 */
+	public Map<String, Node> getNodes() {
+		return nodes;
 	}
 	
 	/**

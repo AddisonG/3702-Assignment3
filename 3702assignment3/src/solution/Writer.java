@@ -1,6 +1,3 @@
-/**
- * 
- */
 package solution;
 
 /**
@@ -8,6 +5,7 @@ package solution;
  * 
  * @author Cameron Darragh<br>Addison Gourluck
  */
-public class Writer {
+public class Writer extends Global {
+	public final static int MODE = DEBUG; // Current debug mode
 	// TODO
 }
