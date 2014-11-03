@@ -4,74 +4,80 @@
 package solution;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
- * @author Cameron Darragh, Addison Gourluck
- * 
  * A node in the Bayesian Network.
- *
+ * 
+ * @author Cameron Darragh<br>Addison Gourluck
  */
 public class Node {
 	
 	/** The name of this node **/
 	private String name; 
+	private int index;
 	
-	// TODO set this to strings
 	/** The list of parents of this node **/
-	private ArrayList<String> parents;
-	
-	
+	private List<Node> parents;
+
 	/**
-	 * Constructor for node
+	 * Node constructor.
+	 * 
+	 * @param name - Name of node
 	 */
-	public Node(String name, ArrayList<String> parents) {
-		// Copy parent list as this parent list
-		this.parents = new ArrayList<String>();
-		this.parents.addAll(parents);
+	public Node(String name) {
 		this.name = name;
+		parents = new ArrayList<Node>();
 	}
 	
+	/**
+	 * Node constructor.
+	 * 
+	 * @param name - Name of node
+	 * @param index - Index of node
+	 */
+	public Node(String name, int index) {
+		this.name = name;
+		this.index = index;
+		parents = new ArrayList<Node>();
+	}
 	
 	/** 
 	 * Adds a new parent to this node
 	 * 
-	 * @param parent - the new parent to add
+	 * @param parent - The new parent to add
 	 */
-	public void addParent(String parent) {
+	public void addParent(Node parent) {
 		// Check given Node is not already a parent
-		if(!parents.contains(parent)) {
+		if (parent != null && !parents.contains(parent)) {
 			parents.add(parent);
 		}
 	}
 	
+	public void setIndex(int index) {
+		this.index = index;
+	}
 	
 	/**
 	 * Returns the list of parents for this node
 	 * 
-	 * @return	- list of nodes which are parents
+	 * @return List of nodes which are parents
 	 */
-	public ArrayList<String> getParents() {
+	public List<Node> getParents() {
 		return parents;
 	}
 	
-	
 	/**
-	 * Sets the name of this node
-	 * 
-	 * @param newName - the new name to set
-	 */
-	public void setName(String newName) {
-		this.name = newName;
-	}
-	
-	
-	/**
-	 * Returns the name of the node
-	 * 
-	 * @return the name of the node
+	 * @return The name of the node
 	 */
 	public String getName() {
 		return this.name;
 	}
-
+	
+	/**
+	 * @return The index of the node
+	 */
+	public int getIndex() {
+		return this.index;
+	}
 }

@@ -3,103 +3,147 @@
  */
 package solution;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 /**
- * @author Cameron Darragh, Addison Gourluck
- * 
  * Static class used to read in the files and initialise the appropriate
  * classes with the read data.
- *
+ * 
+ * @author Cameron Darragh<br>Addison Gourluck
  */
-public final class Reader {
-
-	//TODO check method works correctly
+public class Reader {
+	public final static int ERROR = 0; // Nothing except critical errors
+	public final static int INFO = 1; // Only important information
+	public final static int DEBUG = 2; // Absolutely everything
+	
+	public final static int MODE = DEBUG; // Current debug mode
+	
 	/**
-	 * Reads the file at the given path.
-	 * Creates a new Bayesian Network filled with nodes
-	 * from the read file.
+	 * Opens and reads the file at the given path, returning the Bayesian
+	 * Network contained within the data.
 	 * 
 	 * @param filePath - path to file to read
-	 * @return - a new network representation of that file
+	 * @return a new network representation of that file
 	 * @throws IOException 
 	 */
-	public static BayesianNetwork readFile(String filePath) throws IOException {
-		System.out.println("Loading file at " + filePath);
+	public static BayesianNetwork readFile(String filePath) {
+		BayesianNetwork network = null;
+		BufferedReader br = null;
 		
-		BayesianNetwork network;
+		log(INFO, "Loading file at " + filePath);
 		
-		BufferedReader input = new BufferedReader(new FileReader(filePath));
-		String line;
-		int lineNo = 0;
-		Scanner s;
 		try {
-			line = input.readLine();
-			lineNo++;
-			s = new Scanner(line);
-			int numNodes = s.nextInt();
-			int numData = s.nextInt();
-			
-			System.out.println("Nodes are " + numNodes + ", data lines are " + numData);
-			
-			s.close();
-			
-			ArrayList<Node> nodes = new ArrayList<Node>();
-			// Read in and setup each node
-			for(int i = 0; i < numNodes; i++) {
-				line = input.readLine();
-				lineNo++;
-				
-				String name;
-				ArrayList<String> parents = new ArrayList<String>();
-				
-				s = new Scanner(line);
-				name = s.next();
-				
-				// Add parents
-				while(s.hasNext()) {
-					parents.add(s.next());
-				}
-				
-				nodes.add(new Node(name, parents));
-			}
-			
-			ArrayList<ArrayList<Boolean>> data = new ArrayList<ArrayList<Boolean>>();
-			// Read in each data point
-			for(int i = 0; i < numData; i++) {
-				line = input.readLine();
-				lineNo++;
-				
-				ArrayList<Boolean> row = new ArrayList<Boolean>();
-				for(int j = 0; j < numNodes; j++) {
-					s = new Scanner(line);
-					int dataPoint = s.nextInt();
-					
-					// set to true or false in data
-					if(dataPoint == 1) {
-						row.add(true);
-					} else {
-						row.add(false);
-					}
-				}
-				data.add(row);
-			}
-			
-			// Create Bayesian Network
-			network = new BayesianNetwork(nodes, data);
-			
-		} catch(Exception e) {
-			System.out.println("Something went wrong :(");
-			throw new IOException(e.getMessage());
-			
-		} finally {
-			input.close();
+			br = new BufferedReader(new FileReader(filePath));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			log(ERROR, "Error opening file.");
+			System.exit(1);
 		}
 		
-		System.out.println("Finished reading from file");
+		try {
+			network = extractData(br);
+		} catch (IOException e) {
+			e.printStackTrace();
+			log(ERROR, "Error reading data.");
+		}
 		
+		try {
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			log(ERROR, "Error closing file.");
+			System.exit(1);
+		}
+		
+		log(INFO, "Finished reading from file.");
 		return network;
 	}
-
+	
+	/**
+	 * Extracts the data from the buffered reader, and returns it as a Bayesian
+	 * Network.
+	 * 
+	 * @param br - Already opened buffered reader
+	 * @return Bayesian network
+	 * @throws IOException
+	 */
+	private static BayesianNetwork extractData(BufferedReader br)
+			throws IOException {
+		String line;
+		Scanner s;
+		
+		line = br.readLine();
+		s = new Scanner(line);
+		int numNodes = s.nextInt();
+		int numData = s.nextInt();
+		s.close();
+		
+		log(INFO, numNodes + " nodes, with " + numData + " lines of data.");
+		
+		// Initialise hashmap so that it won't have to rehash.
+		Map<String, Node> nodes = new HashMap<String, Node>((int) Math.ceil(numNodes / 0.75));
+		
+		// Read in and setup each node
+		for (int i = 0; i < numNodes; i++) {
+			line = br.readLine();
+			
+			s = new Scanner(line);
+			String name = s.next();
+			
+			log(DEBUG, "\nAdding: " + name);
+			// Create or set current node, and its index
+			Node current;
+			if (nodes.containsKey(name)) {
+				current = nodes.get(name);
+				current.setIndex(i);
+			} else {
+				nodes.put(name, new Node(name, i));
+				current = nodes.get(name);
+			}
+			
+			// Add parents
+			while (s.hasNext()) {
+				String parent = s.next();
+				log(DEBUG, "  Parent: " + parent);
+				if (nodes.containsKey(parent)) {
+					// parent already exists, add it
+					current.addParent(nodes.get(parent));
+				} else {
+					// parent doesn't exist, create and add it
+					nodes.put(parent, new Node(parent));
+					current.addParent(nodes.get(parent));
+				}
+			}
+		}
+		
+		List<Boolean[]> data = new ArrayList<Boolean[]>(numData);
+		// Read in each data point
+		for (int i = 0; i < numData; i++) {
+			line = br.readLine();
+			s = new Scanner(line);
+			
+			boolean[] row = new boolean[numNodes];
+			
+			for (int j = 0; j < numNodes; j++) {
+				row[j] = s.nextInt() == 1 ? true : false;
+			}
+		}
+		
+		// Create Bayesian Network
+		return new BayesianNetwork(nodes, data);
+	}
+	
+	private static void log(int mode, String str) {
+		if (DEBUG >= mode) {
+			System.out.println(str);
+		}
+	}
 }

@@ -4,13 +4,10 @@
 package solution;
 
 /**
- * @author Cameron Darragh, Addison Gourluck
- * 
  * Writes data to text files.
- *
+ * 
+ * @author Cameron Darragh<br>Addison Gourluck
  */
 public class Writer {
-
-
-
+	// TODO
 }

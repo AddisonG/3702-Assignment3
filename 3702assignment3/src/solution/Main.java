@@ -4,10 +4,9 @@
 package solution;
 
 /**
- * @author Cameron Darragh, Addison Gourluck
- * 
  * Main class for starting and running the program.
- *
+ * 
+ * @author Cameron Darragh<br>Addison Gourluck
  */
 public class Main {
 
@@ -16,6 +15,7 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		
+		Reader.readFile("data/CPTNoMissingData-d1.txt");
 		// TODO take args as text file I think
 		
 		// TODO create Bayesian Network from file
@@ -25,5 +25,4 @@ public class Main {
 		// TODO create output files of CPT
 
 	}
-
 }
