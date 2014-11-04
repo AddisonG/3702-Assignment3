@@ -44,7 +44,7 @@ public class BayesianNetwork extends Global {
 	 * @param bool - The boolean value compared with each value of family
 	 * @return Amount of rows where all nodes in the family match bool
 	 */
-	public int getBooleanCount(List<Node> family, boolean bool) {
+	public int countBooleanData(List<Node> trueList, List<Node> falseList) {
 		int count = 0; // Number of valid rows
 		
 		// For each row in the data
@@ -52,8 +52,16 @@ public class BayesianNetwork extends Global {
 			boolean valid = true;
 			
 			// If any nodes value in this row differs from bool, discount the row
-			for (Node n : family) {
-				if (row[n.getIndex()] == bool) {
+			for (Node n : trueList) {
+				if (row[n.getIndex()] == true) {
+					valid = false;
+					break;
+				}
+			}
+
+			// If any nodes value in this row differs from bool, discount the row
+			for (Node n : falseList) {
+				if (row[n.getIndex()] == false) {
 					valid = false;
 					break;
 				}
@@ -88,17 +96,17 @@ public class BayesianNetwork extends Global {
 		if(node.hasParents()) {
 			
 			// Only count data rows that are true for node
-			dataLength = getBooleanCount(trueList, true); // Since at this point only the node is in truelist
+			dataLength = countBooleanData(trueList, null); // Since at this point only the node is in truelist
 			
 			// Add the node's parents to our list to check
 			trueList.addAll(node.getParents());
 			
 			// Get the amount of rows where the above list is all true
-			trueCount = getBooleanCount(trueList, true);
+			trueCount = countBooleanData(trueList, null);
 			
 		} else {
 			// If no parents, count is just where node is true
-			trueCount = getBooleanCount(trueList, true);
+			trueCount = countBooleanData(trueList, null);
 		}
 			
 		// Ensure no divide by 0 occurs using Bayesian Correction
