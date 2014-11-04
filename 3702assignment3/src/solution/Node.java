@@ -19,7 +19,6 @@ public class Node {
 
 	/**
 	 * Node constructor.
-	 * TODO constructor should take list of parents too
 	 * 
 	 * @param name - Name of node
 	 */
@@ -40,16 +39,14 @@ public class Node {
 		}
 	}
 	
-
 	/**
-	 * Does this node have parents?
+	 * Returns if this node has parents
 	 * 
-	 * @return false if unloved
+	 * @return true if has parents, else false
 	 */
 	public boolean hasParents() {
 		return (parents.size() != 0);
 	}
-	
 	
 	public void setIndex(int index) {
 		this.index = index;

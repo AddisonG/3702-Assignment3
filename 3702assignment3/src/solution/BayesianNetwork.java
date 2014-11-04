@@ -11,7 +11,7 @@ import java.util.Map;
  * @author Cameron Darragh Addison Gourluck
  */
 public class BayesianNetwork extends Global {
-	public final static int MODE = DEBUG; // Current debug mode //TODO shouldn't this be in Main.java?
+	public final static int MODE = DEBUG; // Current debug mode
 	
 	/** The list of nodes in this network **/
 	private Map<String, Node> nodes;
@@ -24,7 +24,6 @@ public class BayesianNetwork extends Global {
 		this.nodes = nodes;
 		this.data = data;
 	}
-	
 	
 	/**
 	 * @return All of the nodes within this Bayesian Network
@@ -48,7 +47,7 @@ public class BayesianNetwork extends Global {
 		int count = 0; // Number of valid rows
 		
 		// For each row in the data
-		for (Boolean[] row: data) {
+		for (Boolean[] row : data) {
 			boolean valid = true;
 			
 			// If any nodes value in this row not true, discount the row
@@ -93,7 +92,7 @@ public class BayesianNetwork extends Global {
 		int dataLength = data.size();
 		
 		// If parents, get amount of data where this node == true AND parents == true
-		if(node.hasParents()) {
+		if (node.hasParents()) {
 			
 			// Only count data rows that are true for node
 			dataLength = countBooleanData(trueList, null); // Since at this point only the node is in truelist

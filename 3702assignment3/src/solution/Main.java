@@ -14,11 +14,11 @@ public class Main extends Global {
 	public static void main(String[] args) {
 		
 		if (args.length == 99) { // just for now
-			log(ERROR, "Usage: [filepath]... and mode (????)."); // TODO // TODO
+			log(ERROR, "Usage: [filepath]... and mode (????)."); // TODO
 			System.exit(1);
 		}
 		
-		String filePath = "data/CPTNoMissingData-d1.txt"; // args[0];
+		String filePath = "data/CPTNoMissingData-d1.txt"; // arg0;
 		
 		// Never change this name
 		// Clever name, but the "o" in the middle ruins the perfection
