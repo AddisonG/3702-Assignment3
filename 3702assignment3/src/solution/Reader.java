@@ -94,7 +94,12 @@ public class Reader extends Global {
 			log(DEBUG, "\nAdding: " + name);
 			// Create or set current node, and its index
 			Node current;
-			nodes.putIfAbsent(name, new Node(name)); //TODO this doesn't exist
+			
+			// Add node if doesn't exist
+			if(!nodes.containsKey(name)) {
+				nodes.put(name, new Node(name));
+			}
+			
 			current = nodes.get(name);
 			current.setIndex(i);
 			
