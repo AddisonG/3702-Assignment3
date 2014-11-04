@@ -51,17 +51,17 @@ public class BayesianNetwork extends Global {
 		for (Boolean[] row: data) {
 			boolean valid = true;
 			
-			// If any nodes value in this row differs from bool, discount the row
+			// If any nodes value in this row not true, discount the row
 			for (Node n : trueList) {
-				if (row[n.getIndex()] == true) {
+				if (row[n.getIndex()] == false) {
 					valid = false;
 					break;
 				}
 			}
 
-			// If any nodes value in this row differs from bool, discount the row
+			// If any nodes value in this row not false, discount the row
 			for (Node n : falseList) {
-				if (row[n.getIndex()] == false) {
+				if (row[n.getIndex()] == true) {
 					valid = false;
 					break;
 				}
