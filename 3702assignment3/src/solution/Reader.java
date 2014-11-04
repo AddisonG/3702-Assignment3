@@ -14,7 +14,7 @@ import java.util.Scanner;
  * Static class used to read in the files and initialise the appropriate
  * classes with the read data.
  * 
- * @author Cameron Darragh<br>Addison Gourluck
+ * @author Cameron Darragh Addison Gourluck
  */
 public class Reader extends Global {
 	public final static int MODE = DEBUG; // Current debug mode
@@ -94,7 +94,7 @@ public class Reader extends Global {
 			log(DEBUG, "\nAdding: " + name);
 			// Create or set current node, and its index
 			Node current;
-			nodes.putIfAbsent(name, new Node(name));
+			nodes.putIfAbsent(name, new Node(name)); //TODO this doesn't exist
 			current = nodes.get(name);
 			current.setIndex(i);
 			
@@ -122,6 +122,7 @@ public class Reader extends Global {
 			boolean[] row = new boolean[numNodes];
 			
 			for (int j = 0; j < numNodes; j++) {
+				// Personally I hate lines like this in code, but we can keep it if you want
 				row[j] = s.nextInt() == 1 ? true : false;
 			}
 		}

@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * A node in the Bayesian Network.
  * 
- * @author Cameron Darragh<br>Addison Gourluck
+ * @author Cameron Darragh Addison Gourluck
  */
 public class Node {
 	
@@ -19,6 +19,7 @@ public class Node {
 
 	/**
 	 * Node constructor.
+	 * TODO constructor should take list of parents too
 	 * 
 	 * @param name - Name of node
 	 */
@@ -38,6 +39,17 @@ public class Node {
 			parents.add(parent);
 		}
 	}
+	
+
+	/**
+	 * Does this node have parents?
+	 * 
+	 * @return false if unloved
+	 */
+	public boolean hasParents() {
+		return (parents.size() != 0);
+	}
+	
 	
 	public void setIndex(int index) {
 		this.index = index;

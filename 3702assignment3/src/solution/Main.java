@@ -3,7 +3,7 @@ package solution;
 /**
  * Main class for starting and running the program.
  * 
- * @author Cameron Darragh<br>Addison Gourluck
+ * @author Cameron Darragh Addison Gourluck
  */
 public class Main extends Global {
 	public final static int MODE = DEBUG; // Current debug mode
@@ -14,13 +14,17 @@ public class Main extends Global {
 	public static void main(String[] args) {
 		
 		if (args.length == 99) { // just for now
-			log(ERROR, "Only give two arguments, a filepath and mode (????)."); // TODO
+			log(ERROR, "Usage: [filepath]... and mode (????)."); // TODO // TODO
 			System.exit(1);
 		}
 		
-		// Never change this name
-		BayesianNetwork bayonet = Reader.readFile("data/CPTNoMissingData-d1.txt");
+		String filePath = "data/CPTNoMissingData-d1.txt"; // args[0];
 		
+		// Never change this name
+		// Clever name, but the "o" in the middle ruins the perfection
+		BayesianNetwork bayonet = Reader.readFile(filePath);
+		
+		// Get the CPT of A for some reason
 		bayonet.calculateCPT(bayonet.getNodes().get("A"));
 		
 		// TODO take args as text file I think

@@ -8,10 +8,10 @@ import java.util.Map;
  * Represents the Bayesian Network with nodes.
  * Serves as a controller for node calculations.
  * 
- * @author Cameron Darragh<br>Addison Gourluck
+ * @author Cameron Darragh Addison Gourluck
  */
 public class BayesianNetwork extends Global {
-	public final static int MODE = DEBUG; // Current debug mode
+	public final static int MODE = DEBUG; // Current debug mode //TODO shouldn't this be in Main.java?
 	
 	/** The list of nodes in this network **/
 	private Map<String, Node> nodes;
@@ -21,9 +21,10 @@ public class BayesianNetwork extends Global {
 	private List<Boolean[]> data;
 	
 	public BayesianNetwork(Map<String, Node> nodes, List<Boolean[]> data) {
-		this.data = data;
 		this.nodes = nodes;
+		this.data = data;
 	}
+	
 	
 	/**
 	 * @return All of the nodes within this Bayesian Network
@@ -32,8 +33,12 @@ public class BayesianNetwork extends Global {
 		return nodes;
 	}
 	
+	
 	/**
 	 * Returns the count where every node in a given data has value 'bool'
+	 * 
+	 * TODO if we're only using one list and looking for true, we don't need bool var
+	 * TODO calling a boolean bool is like calling a string myString
 	 * 
 	 * @param family - List of nodes to be compared with bool
 	 * @param bool - The boolean value compared with each value of family
@@ -71,18 +76,31 @@ public class BayesianNetwork extends Global {
 	 * @return
 	 */
 	public double calculateCPT(Node node) {
-		// Get amount of data where this node == true AND parent(s) == true
+		
+		int trueCount;
 		List<Node> trueList = new ArrayList<Node>();
-		// Add the node and its parents to our list to check
 		trueList.add(node);
-		trueList.addAll(node.getParents());
 		
-		// Get the amount of rows where the above list is all true
-		int trueCount = getBooleanCount(trueList, true);
-		
-		// Get total amount of data.
+		// Get total amount of data rows
 		int dataLength = data.size();
 		
+		// If parents, get amount of data where this node == true AND parents == true
+		if(node.hasParents()) {
+			
+			// Only count data rows that are true for node
+			dataLength = getBooleanCount(trueList, true); // Since at this point only the node is in truelist
+			
+			// Add the node's parents to our list to check
+			trueList.addAll(node.getParents());
+			
+			// Get the amount of rows where the above list is all true
+			trueCount = getBooleanCount(trueList, true);
+			
+		} else {
+			// If no parents, count is just where node is true
+			trueCount = getBooleanCount(trueList, true);
+		}
+			
 		// Ensure no divide by 0 occurs using Bayesian Correction
 		if (dataLength == 0) {
 			dataLength++;
