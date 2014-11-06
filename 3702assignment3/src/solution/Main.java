@@ -1,5 +1,7 @@
 package solution;
 
+import java.io.IOException;
+
 /**
  * Main class for starting and running the program.
  * 
@@ -18,21 +20,24 @@ public class Main extends Global {
 			System.exit(1);
 		}
 		
-		String dataset = args[0];
-		String filePath = "data/" + dataset + ".txt";
-		String mode = args[1];
+		String filename = args[0];
+		String filepath = "data/" + filename + ".txt";
 		
 		// Create Bayesian Network from file
-		BayesianNetwork bayonet = Reader.readFile(filePath);
+		BayesianNetwork bayonet = Reader.readFile(filepath);
 		
-		
-		switch(mode) {
-		case "task1":
-			String fileName = "cpt-" + dataset + ".txt";
-			Writer.writeFile(fileName , bayonet);
-			break;
+		try {
+			Writer.writeFile(args, bayonet);
+		} catch(IOException e) {
+			log(ERROR, "Error Writing File!");
+			e.printStackTrace();
+			System.exit(1);
 		}
-
-		
+	}
+	
+	private static void log(int mode, String str) {
+		if (MODE >= mode) {
+			System.out.println(str);
+		}
 	}
 }

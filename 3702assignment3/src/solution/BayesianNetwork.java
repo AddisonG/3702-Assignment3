@@ -11,19 +11,18 @@ import java.util.Map;
  * @author Cameron Darragh Addison Gourluck
  */
 public class BayesianNetwork extends Global {
-	public final static int MODE = DEBUG; // Current debug mode
+	public final static int MODE = INFO; // Current debug mode
 	
 	/** The list of nodes in this network **/
 	private Map<String, Node> nodes;
 	
-	/** The data table of this network. Outer Arraylist is each row, 
-	 * inner Arraylist is each node **/
-	private List<boolean[]> data;
+	/** The data table of this network. Outer list is each row, 
+	 * inner list is each node **/
+	private List<List<Boolean>> data;
 	
-	public BayesianNetwork(Map<String, Node> nodes, List<boolean[]> data2) {
+	public BayesianNetwork(Map<String, Node> nodes, List<List<Boolean>> data2) {
 		this.nodes = nodes;
 		this.data = data2;
-		log(DEBUG, "Created network with data: " + this.data.toString());
 	}
 	
 	/**
@@ -32,7 +31,6 @@ public class BayesianNetwork extends Global {
 	public Map<String, Node> getNodes() {
 		return nodes;
 	}
-	
 	
 	/**
 	 * Returns the amount of rows where everything in true list is true
@@ -48,26 +46,26 @@ public class BayesianNetwork extends Global {
 		log(DEBUG, "Truelist: " + trueList.toString());
 		log(DEBUG, "Falselist " + falseList.toString());
 		
-		if(data.size() == 0) {
+		if (data.size() == 0) {
 			log(ERROR, "ERROR: No data found");
 			System.exit(1);
 		}
 		
 		// For each row in the data
-		for (boolean[] row : data) {
+		for (List<Boolean> row : data) {
 			boolean valid = true;
 			
 			// If any nodes value in this row not true, discount the row
 			for (Node n : trueList) {
-				if (row[n.getIndex()] == false) {
+				if (row.get(n.getIndex()) == false) {
 					valid = false;
 					break;
 				}
 			}
-
+			
 			// If any nodes value in this row not false, discount the row
 			for (Node n : falseList) {
-				if (row[n.getIndex()] == true) {
+				if (row.get(n.getIndex()) == true) {
 					valid = false;
 					break;
 				}
@@ -78,13 +76,8 @@ public class BayesianNetwork extends Global {
 				count++;
 			}
 		}
-		
-		
-		log(DEBUG, " ");
 		return count;
 	}
-	
-	
 	
 	/**
 	 * Returns the amount of rows where a node and its parents are all true.
@@ -135,9 +128,6 @@ public class BayesianNetwork extends Global {
 		return trueCount / dataLength;
 	}
 	
-	
-	
-	
 	/**
 	 * Create a list of probabilities for
 	 * all possible truth combinations of parents.
@@ -150,7 +140,7 @@ public class BayesianNetwork extends Global {
 	 * @param node - The node to get all probabilities for
 	 * @return - All probabilities for that node
 	 */
-	public ArrayList<Double> getAllProbabilities(Node node) {
+	public List<Double> getAllProbabilities(Node node) {
 		
 		// Get parents of node
 		List<Node> parents = node.getParents();
@@ -161,15 +151,12 @@ public class BayesianNetwork extends Global {
 		log(INFO, "About to create probability list for " + trueList);
 		
 		// Get list of every possible true/false combination of all parents
-		ArrayList<Double> probabilities = getRecursiveProbabilities(trueList, falseList, parents);
+		List<Double> probabilities = getRecursiveProbabilities(trueList, falseList, parents);
 		
-		log(INFO, "Finished creating probability list:");
-		log(INFO, probabilities.toString());
+		log(INFO, "Finished creating probability list: " + probabilities.toString());
 		
 		return probabilities;
 	}
-	
-	
 	
 	/**
 	 * RECURSION WARNING
@@ -200,18 +187,16 @@ public class BayesianNetwork extends Global {
 	 * 
 	 * @return An ordered list of all probabilities for remainingNodes
 	 */
-	private ArrayList<Double> getRecursiveProbabilities(List<Node> trueList, List<Node> falseList, List<Node> remainingNodes) {
+	private List<Double> getRecursiveProbabilities(List<Node> trueList, List<Node> falseList, List<Node> remainingNodes) {
 		
-		log(DEBUG, " ");
-		log(DEBUG, "Getting probabilities recursively!");
 		log(DEBUG, "True list: " + trueList);
 		log(DEBUG, "False list: " + falseList);
 		log(DEBUG, "Remainder list: " + remainingNodes);
 		
-		ArrayList<Double> probabilities = new ArrayList<Double>();
+		List<Double> probabilities = new ArrayList<Double>();
 		
 		// If no remaining nodes, return probability of these lists
-		if(remainingNodes.size() == 0) {
+		if (remainingNodes.size() == 0) {
 			
 			log(DEBUG, "At base case");
 			
@@ -226,7 +211,7 @@ public class BayesianNetwork extends Global {
 			trueList.add(0, temp);
 			
 			// Avoid divide by zero
-			if(dataCount == 0) {
+			if (dataCount == 0) {
 				count++;
 				dataCount++;
 			}
@@ -248,7 +233,6 @@ public class BayesianNetwork extends Global {
 		// Add all probabilities from recursion
 		probabilities.addAll(getRecursiveProbabilities(trueList, falseList, remainingNodes));
 		
-		
 		// Get all probabilities when first remaining node is true instead
 		falseList.remove(newNode);
 		trueList.add(newNode);
@@ -257,5 +241,9 @@ public class BayesianNetwork extends Global {
 		return probabilities;
 	}
 	
-	
+	private static void log(int mode, String str) {
+		if (MODE >= mode) {
+			System.out.println(str);
+		}
+	}
 }
