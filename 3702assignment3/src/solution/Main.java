@@ -27,10 +27,14 @@ public class Main extends Global {
 		
 		
 		switch(mode) {
-		case "task1":
-			String fileName = "cpt-" + dataset + ".txt";
-			Writer.writeFile(fileName , bayonet);
-			break;
+			case "task1":
+				String fileName = "cpt-" + dataset + ".txt";
+				Writer.writeFile(fileName , bayonet);
+				break;
+			default:
+				log(ERROR, "invalid mode given");
+				System.exit(1);
+				
 		}
 
 		

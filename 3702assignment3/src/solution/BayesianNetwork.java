@@ -79,7 +79,7 @@ public class BayesianNetwork extends Global {
 			}
 		}
 		
-		
+		log(DEBUG, "Count is " + count);
 		log(DEBUG, " ");
 		return count;
 	}
@@ -153,9 +153,9 @@ public class BayesianNetwork extends Global {
 	public ArrayList<Double> getAllProbabilities(Node node) {
 		
 		// Get parents of node
-		List<Node> parents = node.getParents();
-		List<Node> trueList = new ArrayList<Node>();
-		List<Node> falseList = new ArrayList<Node>();
+		ArrayList<Node> parents = (ArrayList<Node>) node.getParents();
+		ArrayList<Node> trueList = new ArrayList<Node>();
+		ArrayList<Node> falseList = new ArrayList<Node>();
 		trueList.add(node);
 		
 		log(INFO, "About to create probability list for " + trueList);
@@ -200,7 +200,8 @@ public class BayesianNetwork extends Global {
 	 * 
 	 * @return An ordered list of all probabilities for remainingNodes
 	 */
-	private ArrayList<Double> getRecursiveProbabilities(List<Node> trueList, List<Node> falseList, List<Node> remainingNodes) {
+	@SuppressWarnings("unchecked")
+	private ArrayList<Double> getRecursiveProbabilities(ArrayList<Node> trueList, ArrayList<Node> falseList, ArrayList<Node> remainingNodes) {
 		
 		log(DEBUG, " ");
 		log(DEBUG, "Getting probabilities recursively!");
@@ -218,12 +219,11 @@ public class BayesianNetwork extends Global {
 			// Calculate the amount of data for these lists
 			double count = countBooleanData(trueList, falseList);
 			
+			ArrayList<Node> temp = (ArrayList<Node>) trueList.clone();
+			temp.remove(0);
 			
-			Node temp = trueList.remove(0);
 			// Calculate the amount of data for these lists without original node
-			double dataCount = countBooleanData(trueList, falseList);
-			// Add node back in so nothing breaks TODO might be a better way to do this
-			trueList.add(0, temp);
+			double dataCount = countBooleanData(temp, falseList);
 			
 			// Avoid divide by zero
 			if(dataCount == 0) {
@@ -245,14 +245,25 @@ public class BayesianNetwork extends Global {
 		// Get all probabilities when first remaining node is false
 		falseList.add(newNode);
 		
-		// Add all probabilities from recursion
-		probabilities.addAll(getRecursiveProbabilities(trueList, falseList, remainingNodes));
+		// Create a copy of the arraylist as lower levels will modify given list
+		ArrayList<Node> trueCopy = (ArrayList<Node>) trueList.clone();
+		ArrayList<Node> falseCopy = (ArrayList<Node>) falseList.clone();
+		ArrayList<Node> remainderCopy = (ArrayList<Node>) remainingNodes.clone();
 		
+		
+		// Add all probabilities from recursion
+		probabilities.addAll(getRecursiveProbabilities(trueCopy, falseCopy, remainderCopy));
 		
 		// Get all probabilities when first remaining node is true instead
 		falseList.remove(newNode);
 		trueList.add(newNode);
-		probabilities.addAll(getRecursiveProbabilities(trueList, falseList, remainingNodes));
+		
+		// Create a copy of the arraylist as lower levels will modify given list
+		trueCopy = (ArrayList<Node>) trueList.clone();
+		falseCopy = (ArrayList<Node>) falseList.clone();
+		remainderCopy = (ArrayList<Node>) remainingNodes.clone();
+
+		probabilities.addAll(getRecursiveProbabilities(trueCopy, falseCopy, remainderCopy));
 		
 		return probabilities;
 	}
