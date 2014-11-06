@@ -74,4 +74,8 @@ public class Node {
 	public int getIndex() {
 		return this.index;
 	}
+	
+	public String toString() {
+		return name;
+	}
 }

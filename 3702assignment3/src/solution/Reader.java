@@ -118,7 +118,7 @@ public class Reader extends Global {
 			}
 		}
 		
-		List<Boolean[]> data = new ArrayList<Boolean[]>(numData);
+		List<boolean[]> data = new ArrayList<boolean[]>(numData);
 		// Read in each data point
 		for (int i = 0; i < numData; i++) {
 			line = br.readLine();
@@ -128,9 +128,18 @@ public class Reader extends Global {
 			
 			for (int j = 0; j < numNodes; j++) {
 				// Personally I hate lines like this in code, but we can keep it if you want
-				row[j] = s.nextInt() == 1 ? true : false;
+				//row[j] = s.nextInt() == 1 ? true : false; // This line of code actually didnt work
+				if(s.nextInt() == 1) {
+					row[j] = true;
+				} else {
+					row[j] = false;
+				}
+				//log(DEBUG, "Added value: " + row[j]);
 			}
+			data.add(row);
 		}
+		
+		log(DEBUG, "Read data as: " + data.toString());
 		
 		// Create Bayesian Network
 		return new BayesianNetwork(nodes, data);

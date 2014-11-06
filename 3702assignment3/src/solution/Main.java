@@ -13,27 +13,26 @@ public class Main extends Global {
 	 */
 	public static void main(String[] args) {
 		
-		if (args.length == 99) { // just for now
-			log(ERROR, "Usage: [filepath]... and mode (????)."); // TODO
+		if (args.length != 2) { // just for now
+			log(ERROR, "Usage: dataset mode");
 			System.exit(1);
 		}
 		
-		String filePath = "data/CPTNoMissingData-d1.txt"; // arg0;
+		String dataset = args[0];
+		String filePath = "data/" + dataset + ".txt";
+		String mode = args[1];
 		
-		// Never change this name
-		// Clever name, but the "o" in the middle ruins the perfection
+		// Create Bayesian Network from file
 		BayesianNetwork bayonet = Reader.readFile(filePath);
 		
-		// Get the CPT of A for some reason
-		bayonet.calculateCPT(bayonet.getNodes().get("A"));
 		
-		// TODO take args as text file I think
-		
-		// TODO create Bayesian Network from file
-		
-		// TODO compute CPT of each node in network
-		
-		// TODO create output files of CPT
+		switch(mode) {
+		case "task1":
+			String fileName = "cpt-" + dataset + ".txt";
+			Writer.writeFile(fileName , bayonet);
+			break;
+		}
+
 		
 	}
 }
