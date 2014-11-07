@@ -21,8 +21,7 @@ public class Writer extends Global {
 				task1(filename, bayonet);
 				break;
 			case "task2":
-				filename = "cpt-" + filename + ".txt";
-				task1(filename, bayonet);
+				task2(bayonet);
 				break;
 			// add more cases, as above
 			default:
@@ -77,6 +76,16 @@ public class Writer extends Global {
 		
 		writer.close();
 	}
+	
+	
+	private static void task2(BayesianNetwork bayonet) {
+		double likelihood = bayonet.calculateMaximumLikelihood();
+		double logLikelihood = bayonet.calculateLogLikelihood();
+		
+		System.err.println("Maximum Likelihood estimate is: " + likelihood);
+		System.err.println("Maximum Log Likelihood estimate is: " + logLikelihood);
+	}
+	
 	
 	private static void log(int mode, String str) {
 		if (MODE >= mode) {

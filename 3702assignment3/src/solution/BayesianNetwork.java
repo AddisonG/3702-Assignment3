@@ -1,5 +1,6 @@
 package solution;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.Map;
  * @author Cameron Darragh Addison Gourluck
  */
 public class BayesianNetwork extends Global {
-	public final static int MODE = INFO; // Current debug mode
+	public final static int MODE = DEBUG; // Current debug mode
 	
 	/** The list of nodes in this network **/
 	private Map<String, Node> nodes;
@@ -25,12 +26,14 @@ public class BayesianNetwork extends Global {
 		this.data = data2;
 	}
 	
+	
 	/**
 	 * @return All of the nodes within this Bayesian Network
 	 */
 	public Map<String, Node> getNodes() {
 		return nodes;
 	}
+	
 	
 	/**
 	 * Returns the amount of rows where everything in true list is true
@@ -82,6 +85,7 @@ public class BayesianNetwork extends Global {
 		return count;
 	}
 	
+	
 	/**
 	 * Returns the amount of rows where a node and its parents are all true.
 	 * This is known as the node's conditional probability table (CPT).
@@ -91,6 +95,7 @@ public class BayesianNetwork extends Global {
 	 * @param node - Node to calculate CPT for
 	 * @return
 	 */
+	/*
 	public double calculateCPT(Node node) {
 		
 		int trueCount;
@@ -130,6 +135,7 @@ public class BayesianNetwork extends Global {
 		// Return probability
 		return trueCount / dataLength;
 	}
+	*/
 	
 	/**
 	 * Create a list of probabilities for
@@ -161,7 +167,34 @@ public class BayesianNetwork extends Global {
 		return probabilities;
 	}
 	
+	
+	private double getProbability(ArrayList<Node> trueList, List<Node> falseList) {
+		
+		ArrayList<Node> temp = (ArrayList<Node>) trueList.clone();
+		temp.remove(0);
+		
+		// Calculate the amount of data for these lists
+		double count = countBooleanData(trueList, falseList);
+		
+		// Calculate the amount of data for these lists without original node
+		double dataCount = countBooleanData(temp, falseList);
+		
+		// Avoid divide by zero
+		if (dataCount == 0) {
+			count++;
+			dataCount++;
+		}
+		
+		double probability = count/dataCount;
+		
+		log(DEBUG, "Probability is " + probability);
+		return probability;
+	}
+	
+	
 	/**
+	 * TODO probabilities should only be calculated once per node
+	 * 
 	 * RECURSION WARNING
 	 * 
 	 * Recursively creates a sorted list of every possible true/false
@@ -203,24 +236,8 @@ public class BayesianNetwork extends Global {
 			
 			log(DEBUG, "At base case");
 			
-			// Calculate the amount of data for these lists
-			double count = countBooleanData(trueList, falseList);
+			double probability = getProbability(trueList, falseList);
 			
-			ArrayList<Node> temp = (ArrayList<Node>) trueList.clone();
-			temp.remove(0);
-			
-			// Calculate the amount of data for these lists without original node
-			double dataCount = countBooleanData(temp, falseList);
-			
-			// Avoid divide by zero
-			if (dataCount == 0) {
-				count++;
-				dataCount++;
-			}
-			
-			double probability = count/dataCount;
-			
-			log(DEBUG, "Probability is " + probability);
 			
 			// Return the probability
 			probabilities.add(probability);
@@ -253,6 +270,90 @@ public class BayesianNetwork extends Global {
 		
 		return probabilities;
 	}
+	
+	
+	public double calculateMaximumLikelihood() {
+		
+		double likelihood = 1; // Starting at one because we multiply
+		
+		log(DEBUG, "Data size is: " + data.size());
+		
+		// For every row in the data
+		for (int i = 0; i < data.size(); i++) {
+			
+			List<Boolean> row = data.get(i);
+			double rowProbability = 1; // Starting at one because we multiply
+		
+			// For every node in the row
+			for (Map.Entry<String, Node> nodeElement : nodes.entrySet()) {
+				
+				// Get the probability of that node...
+				Node node = nodeElement.getValue();
+				
+				log(DEBUG, "Node checked is: " + node.toString());
+		
+				// Get probability where this node is [value of column in row],
+				// including where each parent = [value of their column in row]
+				
+				ArrayList<Node> trueList = new ArrayList<Node>();
+				ArrayList<Node> falseList = new ArrayList<Node>();
+				trueList.add(node);
+				
+				
+				// For every node in the row
+				for (Map.Entry<String, Node> parentNodeElement : nodes.entrySet()) {
+					
+					// Get the probability of that node...
+					Node parentNode = parentNodeElement.getValue();
+
+					// If this node is the parent of our node
+					List<Node> parents = node.getParents();
+					if(parents.contains(parentNode)) {
+						
+						log(DEBUG, "Found parent: " + parentNode.toString() + " for node: " + node.toString());
+						int parentIndex = parentNode.getIndex();
+				
+						// If true add to true list
+						if(row.get(parentIndex)) {
+							trueList.add(parentNode);
+						} else {
+							// If false add to false list
+							trueList.add(parentNode);
+						}
+					}
+				}
+				
+				log(DEBUG, "True list: " + trueList);
+				log(DEBUG, "False list: " + falseList);
+				
+				
+				// Get probability for this node
+				double nodeProbability = getProbability(trueList, falseList);
+				
+				// If this node is false, take opposite of probability
+				int nodeIndex = node.getIndex();
+				if(!row.get(nodeIndex)) {
+					nodeProbability = 1 - nodeProbability;
+				}
+				
+				log(DEBUG, "Probability was: " + nodeProbability);
+		
+				// Multiply this probability by rest in row
+				rowProbability *= nodeProbability;
+			}
+			log(DEBUG, "Row probability was: " + rowProbability);
+			// Multiply this probability by other rows
+			likelihood *= rowProbability;
+		}
+		
+		// Return the total value
+		return likelihood;
+	}
+	
+	public double calculateLogLikelihood() {
+		return Math.log(calculateMaximumLikelihood());
+	}
+	
 	
 	private static void log(int mode, String str) {
 		if (MODE >= mode) {
