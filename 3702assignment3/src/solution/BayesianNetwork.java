@@ -282,6 +282,7 @@ public class BayesianNetwork extends Global {
 		for (int i = 0; i < data.size(); i++) {
 			
 			List<Boolean> row = data.get(i);
+			log(DEBUG, "Checking row: " + row);
 			double rowProbability = 1; // Starting at one because we multiply
 		
 			// For every node in the row
@@ -290,6 +291,7 @@ public class BayesianNetwork extends Global {
 				// Get the probability of that node...
 				Node node = nodeElement.getValue();
 				
+				log(DEBUG, " ");
 				log(DEBUG, "Node checked is: " + node.toString());
 		
 				// Get probability where this node is [value of column in row],
@@ -314,11 +316,11 @@ public class BayesianNetwork extends Global {
 						int parentIndex = parentNode.getIndex();
 				
 						// If true add to true list
-						if(row.get(parentIndex)) {
+						if(row.get(parentIndex) == true) {
 							trueList.add(parentNode);
 						} else {
 							// If false add to false list
-							trueList.add(parentNode);
+							falseList.add(parentNode);
 						}
 					}
 				}
@@ -332,19 +334,21 @@ public class BayesianNetwork extends Global {
 				
 				// If this node is false, take opposite of probability
 				int nodeIndex = node.getIndex();
-				if(!row.get(nodeIndex)) {
+				if(row.get(nodeIndex) == false) {
 					nodeProbability = 1 - nodeProbability;
 				}
 				
-				log(DEBUG, "Probability was: " + nodeProbability);
+				log(DEBUG, "Adjusted probability is: " + nodeProbability);
 		
 				// Multiply this probability by rest in row
 				rowProbability *= nodeProbability;
 			}
-			log(DEBUG, "Row probability was: " + rowProbability);
+			log(DEBUG, "Row probability is: " + rowProbability);
 			// Multiply this probability by other rows
 			likelihood *= rowProbability;
 		}
+		
+		log(DEBUG, "Total probability is: " + likelihood);
 		
 		// Return the total value
 		return likelihood;

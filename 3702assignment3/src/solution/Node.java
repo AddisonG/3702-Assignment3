@@ -76,6 +76,6 @@ public class Node {
 	}
 	
 	public String toString() {
-		return name + "(" + index + ")";
+		return name + "(" + this.index + ")";
 	}
 }
