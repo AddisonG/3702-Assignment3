@@ -11,25 +11,8 @@ import java.util.*;
 public class Writer extends Global {
 	public final static int MODE = INFO; // Current debug mode
 	
-	public static void writeFile(String[] args, BayesianNetwork bayonet) throws IOException {
-		String filename = args[0];
-		String mode = args[1];
-		
-		switch (mode) {
-			case "task1":
-				filename = "cpt-" + filename + ".txt";
-				task1(filename, bayonet);
-				break;
-			case "task2":
-				task2(bayonet);
-				break;
-			// add more cases, as above
-			default:
-				break;
-		}
-	}
 	
-	private static void task1(String filename, BayesianNetwork bayonet) throws IOException {
+	public static void writeCPT(String filename, BayesianNetwork bayonet) throws IOException {
 		String ls = System.getProperty("line.separator");
 		Map<String, Node> nodes = bayonet.getNodes();
 		FileWriter writer = new FileWriter("solutions/" + filename);
@@ -75,15 +58,6 @@ public class Writer extends Global {
 		log(INFO, "Finished Writing!");
 		
 		writer.close();
-	}
-	
-	
-	private static void task2(BayesianNetwork bayonet) {
-		double likelihood = bayonet.calculateMaximumLikelihood();
-		double logLikelihood = bayonet.calculateLogLikelihood();
-		
-		System.err.println("Maximum Likelihood estimate is: " + likelihood);
-		System.err.println("Maximum Log Likelihood estimate is: " + logLikelihood);
 	}
 	
 	

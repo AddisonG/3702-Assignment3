@@ -170,6 +170,7 @@ public class BayesianNetwork extends Global {
 	
 	private double getProbability(ArrayList<Node> trueList, List<Node> falseList) {
 		
+		@SuppressWarnings("unchecked")
 		ArrayList<Node> temp = (ArrayList<Node>) trueList.clone();
 		temp.remove(0);
 		
@@ -182,7 +183,7 @@ public class BayesianNetwork extends Global {
 		// Avoid divide by zero
 		if (dataCount == 0) {
 			count++;
-			dataCount++;
+			dataCount += 2;
 		}
 		
 		double probability = count/dataCount;
@@ -354,9 +355,14 @@ public class BayesianNetwork extends Global {
 		return likelihood;
 	}
 	
+	
+	//TODO I don't think this is the correct implementation.
+	// I think it needs to log and add for each value where it would
+	// normally multiply each probability
 	public double calculateLogLikelihood() {
 		return Math.log(calculateMaximumLikelihood());
 	}
+	
 	
 	
 	private static void log(int mode, String str) {
