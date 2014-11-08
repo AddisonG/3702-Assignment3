@@ -430,8 +430,8 @@ public class BayesianNetwork extends Global {
 		// Check edge isn't already in list of edges
 		for(Edge existingEdge : edges) {
 			
-			if((edge.getChild() == existingEdge.getChild() && edge.getParent() == existingEdge.getParent()) ||
-					edge.getChild() == existingEdge.getParent() && edge.getParent() == existingEdge.getChild()) {
+			if((edge.getChild().equals(existingEdge.getChild()) && edge.getParent().equals(existingEdge.getParent())) ||
+					edge.getChild().equals(existingEdge.getParent()) && edge.getParent().equals(existingEdge.getChild())) {
 				// Edge already exists!
 				return;
 			}

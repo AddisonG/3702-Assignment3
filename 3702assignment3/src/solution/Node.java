@@ -92,6 +92,15 @@ public class Node {
 		return this.name;
 	}
 	
+	
+	public boolean equals(Node node) {
+		if (this.getName().equals(node.getName()) && this.getParents().equals(node.getParents())) {
+			return true;
+		}
+		return false;
+	}
+	
+	
 	/**
 	 * @return The index of the node
 	 */
