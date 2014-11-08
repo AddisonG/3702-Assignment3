@@ -39,7 +39,6 @@ public class Node {
 		}
 	}
 	
-	
 	/**
 	 * Not everyone has good parents, so here's a simple
 	 * method to remove them!
@@ -54,14 +53,12 @@ public class Node {
 		}
 	}
 	
-	
 	/**
 	 * The equivalent of running away from home
 	 */
 	public void removeAllParents() {
 		parents.clear();
 	}
-	
 	
 	/**
 	 * Returns if this node has parents
@@ -86,19 +83,46 @@ public class Node {
 	}
 	
 	/**
+	 * Returns the list of ancestors for this node
+	 * 
+	 * @return List of all nodes which are ancestors
+	 */
+	public List<Node> getAncestors() {
+		List<Node> ancestors = new ArrayList<Node>();
+		
+		// recursion
+		for (Node parent : parents) {
+			ancestors.addAll(parent.getAncestors());
+		}
+		
+		return ancestors;
+	}
+	
+	/**
 	 * @return The name of the node
 	 */
 	public String getName() {
 		return this.name;
 	}
 	
+	/**
+	 * This equals method pays no heed to parents, or to the index, when
+	 * making its comparisons.
+	 * 
+	 * @param node
+	 * @return
+	 */
 	public boolean equals(Node node) {
+		// Check if the same object
+		if (this.equals((Object)node)) {
+			return true;
+		}
+		// Check if same name (ignore parents)
 		if (this.getName().equals(node.getName())) {
 			return true;
 		}
 		return false;
 	}
-	
 	
 	/**
 	 * @return The index of the node

@@ -25,44 +25,41 @@ public class BayesianNetwork extends Global {
 	private List<Edge> edges;
 	
 	
-	public BayesianNetwork(Map<String, Node> nodes, List<List<Boolean>> data2) {
+	public BayesianNetwork(Map<String, Node> nodes, List<List<Boolean>> data) {
 		this.nodes = nodes;
-		this.data = data2;
-		edges = new ArrayList<Edge>();
+		this.data = data;
+		this.edges = new ArrayList<Edge>();
 	}
 	
-	
 	/**
-	 * Create a new Bayesian network as a deep copy of the
-	 * given network
+	 * Create a new Bayesian network as a deep copy of the given network
 	 * 
 	 * @param bayonet
 	 */
 	public BayesianNetwork(BayesianNetwork bayonet) {
 		
 		// Initialize lists
-		this.nodes = new HashMap<String, Node>(bayonet.getNodes().size());
-		this.data = new ArrayList<List<Boolean>>();
+		nodes = new HashMap<String, Node>((int)Math.ceil(bayonet.getNodes().size() / 0.75));
+		data = new ArrayList<List<Boolean>>();
 		edges = new ArrayList<Edge>();
 		
-		Map<String, Node> newNodes = bayonet.getNodes();
+		Map<String, Node> oldNodes = bayonet.getNodes();
 		
 		// Copy all of the nodes over
-		for (Map.Entry<String, Node> nodeElement : newNodes.entrySet()) {
-			String name = nodeElement.getKey();
-			Node oldNode = nodeElement.getValue();
+		for (Map.Entry<String, Node> nodeElement : oldNodes.entrySet()) {
+			String name = nodeElement.getValue().getName();
+			Node newNode = new Node(name);
+			newNode.setIndex(nodeElement.getValue().getIndex());
 			
-			Node newNode = new Node(name.toString());
-			
-			this.nodes.put(name, newNode);
+			nodes.put(name, newNode);
 		}
 		
 		// Copy the data over (for now we never modify data, so this is fine)
-		this.data = bayonet.data;
+		data = bayonet.getData();
 		
 		// Copy the edges over
 		List<Edge> oldEdges = bayonet.getEdges();
-		for(Edge edge : oldEdges) {
+		for (Edge edge : oldEdges) {
 			
 			// Get equivalent nodes from new node list
 			Node newNode1 = nodes.get(edge.getParent().getName());
@@ -74,14 +71,11 @@ public class BayesianNetwork extends Global {
 			// Add new edge to list of edges
 			edges.add(newEdge);
 		}
-		
 	}
-	
 	
 	public List<Edge> getEdges() {
 		return edges;
 	}
-	
 	
 	/**
 	 * @return All of the nodes within this Bayesian Network
