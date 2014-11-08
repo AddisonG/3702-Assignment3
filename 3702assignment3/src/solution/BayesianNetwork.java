@@ -21,9 +21,55 @@ public class BayesianNetwork extends Global {
 	 * inner list is each node **/
 	private List<List<Boolean>> data;
 	
+	/** List of edges between nodes in the network. */
+	private List<Edge> edges;
+	
+	
 	public BayesianNetwork(Map<String, Node> nodes, List<List<Boolean>> data2) {
 		this.nodes = nodes;
 		this.data = data2;
+	}
+	
+	
+	/**
+	 * Create a new Bayesian network as a deep copy of the
+	 * given network
+	 * 
+	 * @param bayonet
+	 */
+	public BayesianNetwork(BayesianNetwork bayonet) {
+		Map<String, Node> newNodes = bayonet.getNodes();
+		
+		// Copy all of the nodes over
+		for (Map.Entry<String, Node> nodeElement : newNodes.entrySet()) {
+			Node oldNode = nodeElement.getValue();
+			Node newNode = new Node(oldNode.getName());
+			nodes.put(newNode.getName(), newNode);
+		}
+		
+		// Copy the data over (for now we never modify data, so this is fine)
+		this.data = bayonet.data;
+		
+		// Copy the edges over
+		List<Edge> oldEdges = bayonet.getEdges();
+		for(Edge edge : oldEdges) {
+			
+			// Get equivalent nodes from new node list
+			Node newNode1 = nodes.get(edge.getParent().getName());
+			Node newNode2 = nodes.get(edge.getChild().getName());
+			
+			// Create the edge between these nodes
+			Edge newEdge = new Edge(newNode1, newNode2);
+			
+			// Add new edge to list of edges
+			edges.add(newEdge);
+		}
+		
+	}
+	
+	
+	public List<Edge> getEdges() {
+		return edges;
 	}
 	
 	
@@ -362,6 +408,49 @@ public class BayesianNetwork extends Global {
 	public double calculateLogLikelihood() {
 		return Math.log(calculateMaximumLikelihood());
 	}
+	
+	
+	public void addEdge(Edge edge) {
+		// Check edge isn't already in list of edges
+		
+		// Add edge to list of edges
+		
+		// Add parent to node
+		
+	}
+	
+	public void removeEdge(Edge edge) {
+		// Check edge is already in list of edges
+		
+		// Remove edge from list
+		
+		// Remove parent from node
+		
+	}
+	
+	
+	public void setEdges(ArrayList<Edge> newEdges) {
+		
+		// For every node
+		
+			// Remove parents from node
+		
+		// Set edges as newEdges
+		
+		// For every edge in newEdges
+		
+			// Add parent to node
+	}
+	
+	
+	public void reverseEdge(Edge edge) {
+		// Check edge is in list of edges
+		
+		// Remove the edge
+		
+		// Add the edge with nodes swapped
+	}
+	
 	
 	
 	
