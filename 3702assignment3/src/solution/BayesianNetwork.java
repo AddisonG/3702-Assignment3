@@ -54,10 +54,6 @@ public class BayesianNetwork extends Global {
 			
 			Node newNode = new Node(name.toString());
 			
-			for(Node parent : oldNode.getParents()) {
-				newNode.addParent(parent);
-			}
-			
 			this.nodes.put(name, newNode);
 		}
 		
