@@ -102,4 +102,11 @@ public class Node {
 	public String toString() {
 		return name + "(" + this.index + ")";
 	}
+	
+	public boolean equals(Node node) {
+		if (this.getName().equals(node.getName()) && this.getParents().equals(node.getParents())) {
+			return true;
+		}
+		return false;
+	}
 }
