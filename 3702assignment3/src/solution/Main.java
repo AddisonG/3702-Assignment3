@@ -104,10 +104,9 @@ public class Main extends Global {
 		// Create naive DAG while spanning doesnt work
 		bayonet = createNaiveDAG(bayonet);
 		
-		// While time taken < 3 minutes
-		// TODO use a timer or something here?
-		int time = 0; // This is just temporary, so it doesnt loop infinitely
-		while(time < 10000) {
+		// While time taken < 2 mins, 55 seconds
+		long startTime = System.currentTimeMillis();
+		while((System.currentTimeMillis() - startTime) < 1000 * 175) {
 		
 			double bestScore = bayonet.calculateScore();
 			BayesianNetwork bestNetwork = bayonet;
@@ -225,7 +224,6 @@ public class Main extends Global {
 				// Set bayonet to be the best
 				bayonet = bestNetwork;
 			}
-			time++;
 		}
 		
 		return bayonet;
@@ -266,7 +264,9 @@ public class Main extends Global {
 			// Add all other nodes as parents
 			for (Map.Entry<String, Node> nodeElement2 : nodes.entrySet()) {
 				Node node2 = nodeElement2.getValue();
-				bayonet.addEdge(new Edge(node1, node2));
+				if (!node1.equals(node2)) {
+					bayonet.addEdge(new Edge(node1, node2));
+				}
 			}
 			return bayonet;
 		}

@@ -17,7 +17,7 @@ import java.util.Scanner;
  * @author Cameron Darragh Addison Gourluck
  */
 public class Reader extends Global {
-	public final static int MODE = INFO; // Current debug mode
+	public final static int MODE = DEBUG; // Current debug mode
 	
 	/**
 	 * Opens and reads the file at the given path, returning the Bayesian

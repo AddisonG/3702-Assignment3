@@ -1,6 +1,5 @@
 package solution;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.Map;
  * @author Cameron Darragh Addison Gourluck
  */
 public class BayesianNetwork extends Global {
-	public final static int MODE = DEBUG; // Current debug mode
+	public final static int MODE = INFO; // Current debug mode
 	
 	/** The list of nodes in this network **/
 	private Map<String, Node> nodes;
@@ -364,7 +363,12 @@ public class BayesianNetwork extends Global {
 					
 					// Get the probability of that node...
 					Node parentNode = parentNodeElement.getValue();
-
+					
+					// Can't be your own parent
+					if (parentNode.equals(node)) {
+						continue;
+					}
+					
 					// If this node is the parent of our node
 					List<Node> parents = node.getParents();
 					if(parents.contains(parentNode)) {
@@ -520,7 +524,7 @@ public class BayesianNetwork extends Global {
 	
 	
 	/**
-	 * Recursively check a node by travelling through all combinations
+	 * Recursively check a node by traveling through all combinations
 	 * of its parents until we either have no parents left (valid) or
 	 * we end up at the node we started from (invalid)
 	 * 
