@@ -222,7 +222,8 @@ public class Main extends Global {
 				
 			} else {
 				// Set bayonet to be the best
-				bayonet = bestNetwork;
+				bayonet = new BayesianNetwork(bestNetwork);
+				log(DEBUG, "New best network!");
 			}
 		}
 		
@@ -291,6 +292,8 @@ public class Main extends Global {
 				return edge1.getWeight().compareTo(edge2.getWeight());
 			}
 		});
+		
+		log(DEBUG, "sorted weights is " + edges);
 		
 		// For each edge in ascending order
 		for(Edge edge : edges) {

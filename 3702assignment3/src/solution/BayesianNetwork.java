@@ -49,8 +49,7 @@ public class BayesianNetwork extends Global {
 		
 		// Copy all of the nodes over
 		for (Map.Entry<String, Node> nodeElement : newNodes.entrySet()) {
-			Node oldNode = nodeElement.getValue();
-			String name = oldNode.getName();
+			String name = nodeElement.getKey();
 			Node newNode = new Node(name);
 			
 			this.nodes.put(name, newNode);
@@ -429,6 +428,16 @@ public class BayesianNetwork extends Global {
 	
 	public void addEdge(Edge edge) {
 		// Check edge isn't already in list of edges
+		for(Edge existingEdge : edges) {
+			
+			if((edge.getChild() == existingEdge.getChild() && edge.getParent() == existingEdge.getParent()) ||
+					edge.getChild() == existingEdge.getParent() && edge.getParent() == existingEdge.getChild()) {
+				// Edge already exists!
+				return;
+			}
+			
+		}
+		
 		if(!edges.contains(edge)) {
 		
 			// Add edge to list of edges
