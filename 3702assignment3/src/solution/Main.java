@@ -110,6 +110,8 @@ public class Main extends Global {
 		
 			double bestScore = bayonet.calculateScore();
 			BayesianNetwork bestNetwork = bayonet;
+			
+			bayonet.checkValidDAG();
 		
 			// Possible actions: create an edge (each pair of nodes), remove an edge from list, change direction of edge
 		
@@ -266,6 +268,7 @@ public class Main extends Global {
 			for (Map.Entry<String, Node> nodeElement2 : nodes.entrySet()) {
 				Node node2 = nodeElement2.getValue();
 				if (!node1.equals(node2)) {
+					log(DEBUG, node1 + " added child " + node2);
 					bayonet.addEdge(new Edge(node1, node2));
 				}
 			}

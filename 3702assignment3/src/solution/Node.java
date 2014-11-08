@@ -94,7 +94,7 @@ public class Node {
 	
 	
 	public boolean equals(Node node) {
-		if (this.getName().equals(node.getName()) && this.getParents().equals(node.getParents())) {
+		if (this.getName().equals(node.getName())) {
 			return true;
 		}
 		return false;

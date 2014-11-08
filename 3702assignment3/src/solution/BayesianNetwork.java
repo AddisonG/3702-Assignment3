@@ -438,7 +438,10 @@ public class BayesianNetwork extends Global {
 			
 		}
 		
+		
 		if(!edges.contains(edge)) {
+			
+			log(INFO, "Adding Edge " + edge.getParent() + ", " + edge.getChild());
 		
 			// Add edge to list of edges
 			edges.add(edge);
@@ -512,12 +515,16 @@ public class BayesianNetwork extends Global {
 	public boolean checkValidDAG() {
 		
 		// For each node in DAG
-		for (Map.Entry<String, Node> nodeElement : nodes.entrySet()) {			
+		for (Map.Entry<String, Node> nodeElement : nodes.entrySet()) {	
+			
 			Node node = nodeElement.getValue();
+			log(INFO, "Checking validity of " + node);
 			List<Node> parents = node.getParents();
 		
 			// For each parent of node
 			for(Node parent : parents) {
+				
+				log(INFO, "Checking validity of " + node + " with " + parent);
 		
 				// Recursively check DAG is valid
 				boolean result = checkValidRecursively(node, parent);

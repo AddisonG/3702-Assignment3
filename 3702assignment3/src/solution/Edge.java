@@ -29,5 +29,13 @@ public class Edge {
 		// TODO
 		return (double) 0;
 	}
+	
+	
+	public boolean equals(Edge edge) {
+		if (this.node1.getName().equals(edge.getParent().getName()) && this.node2.getName().equals(edge.getChild().getName())) {
+			return true;
+		}
+		return false;
+	}
 
 }
