@@ -39,6 +39,30 @@ public class Node {
 		}
 	}
 	
+	
+	/**
+	 * Not everyone has good parents, so here's a simple
+	 * method to remove them!
+	 * 
+	 * Disclaimer: Does not work in real life
+	 * 
+	 * @param parent
+	 */
+	public void removeParent(Node parent) {
+		if(parents.contains(parent)) {
+			parents.remove(parent);
+		}
+	}
+	
+	
+	/**
+	 * The equivalent of running away from home
+	 */
+	public void removeAllParents() {
+		parents.clear();
+	}
+	
+	
 	/**
 	 * Returns if this node has parents
 	 * 

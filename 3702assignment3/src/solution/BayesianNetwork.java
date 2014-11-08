@@ -2,6 +2,7 @@ package solution;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ public class BayesianNetwork extends Global {
 	public BayesianNetwork(Map<String, Node> nodes, List<List<Boolean>> data2) {
 		this.nodes = nodes;
 		this.data = data2;
+		edges = new ArrayList<Edge>();
 	}
 	
 	
@@ -38,13 +40,21 @@ public class BayesianNetwork extends Global {
 	 * @param bayonet
 	 */
 	public BayesianNetwork(BayesianNetwork bayonet) {
+		
+		// Initialize lists
+		this.nodes = new HashMap<String, Node>(bayonet.getNodes().size());
+		this.data = new ArrayList<List<Boolean>>();
+		edges = new ArrayList<Edge>();
+		
 		Map<String, Node> newNodes = bayonet.getNodes();
 		
 		// Copy all of the nodes over
 		for (Map.Entry<String, Node> nodeElement : newNodes.entrySet()) {
 			Node oldNode = nodeElement.getValue();
-			Node newNode = new Node(oldNode.getName());
-			nodes.put(newNode.getName(), newNode);
+			String name = oldNode.getName();
+			Node newNode = new Node(name);
+			
+			this.nodes.put(name, newNode);
 		}
 		
 		// Copy the data over (for now we never modify data, so this is fine)
@@ -402,53 +412,152 @@ public class BayesianNetwork extends Global {
 	}
 	
 	
-	//TODO I don't think this is the correct implementation.
-	// I think it needs to log and add for each value where it would
-	// normally multiply each probability
+
 	public double calculateLogLikelihood() {
 		return Math.log(calculateMaximumLikelihood());
+	}
+	
+	public double calculateScore() {
+		int c = 1; // constant value
+		return calculateLogLikelihood() - (c * data.size());
 	}
 	
 	
 	public void addEdge(Edge edge) {
 		// Check edge isn't already in list of edges
+		if(!edges.contains(edge)) {
 		
-		// Add edge to list of edges
-		
-		// Add parent to node
-		
+			// Add edge to list of edges
+			edges.add(edge);
+			
+			// Add parent to node
+			Node child = edge.getChild();
+			Node parent = edge.getParent();
+			child.addParent(parent);
+			
+		}
 	}
 	
 	public void removeEdge(Edge edge) {
 		// Check edge is already in list of edges
+		if(edges.contains(edge)) {
 		
-		// Remove edge from list
-		
-		// Remove parent from node
-		
+			// Remove edge from list
+			edges.remove(edge);
+			
+			// Remove parent from node
+			Node child = edge.getChild();
+			Node parent = edge.getParent();
+			child.removeParent(parent);
+		}
 	}
 	
 	
 	public void setEdges(ArrayList<Edge> newEdges) {
 		
-		// For every node
-		
+		// Remove all existing parents
+		for (Map.Entry<String, Node> nodeElement : nodes.entrySet()) {
+			Node node = nodeElement.getValue();
+			
 			// Remove parents from node
-		
-		// Set edges as newEdges
+			node.removeAllParents();
+		}
 		
 		// For every edge in newEdges
-		
-			// Add parent to node
+		for(Edge edge : newEdges) {
+			
+			// Add the edge to the graph
+			addEdge(edge);
+		}
 	}
 	
 	
 	public void reverseEdge(Edge edge) {
 		// Check edge is in list of edges
+		if(edges.contains(edge)) {
 		
-		// Remove the edge
+			// Remove the edge
+			removeEdge(edge);
+			
+			// Create new edge with order swapped
+			Edge newEdge = new Edge(edge.getChild(), edge.getParent());
+			
+			// Add the edge with nodes swapped
+			addEdge(newEdge);
+		}
+	}
+	
+	
+	/**
+	 * Checks that the DAG is valid for this network
+	 * 
+	 * TODO I think this should also make sure all nodes are connected
+	 * in one graph
+	 * 
+	 * @return
+	 */
+	public boolean checkValidDAG() {
 		
-		// Add the edge with nodes swapped
+		// For each node in DAG
+		for (Map.Entry<String, Node> nodeElement : nodes.entrySet()) {			
+			Node node = nodeElement.getValue();
+			List<Node> parents = node.getParents();
+		
+			// For each parent of node
+			for(Node parent : parents) {
+		
+				// Recursively check DAG is valid
+				boolean result = checkValidRecursively(node, parent);
+				
+				if(result == false) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	
+	/**
+	 * Recursively check a node by travelling through all combinations
+	 * of its parents until we either have no parents left (valid) or
+	 * we end up at the node we started from (invalid)
+	 * 
+	 * Uses depth-first search
+	 * 
+	 * @param checkNode - Node we are checking validity of
+	 * @param currentNode - Current ancestor of node
+	 * 
+	 * @return true if node is not an ancestor of itself
+	 * @return false if node checked was found
+	 */
+	public boolean checkValidRecursively(Node checkNode, Node currentNode) {
+		
+		// If currentNode = Node return false
+		if(checkNode.equals(currentNode)) {
+			return false;
+		}
+		
+		// Else if currentNode has no parents return true
+		if(currentNode.hasParents() == false) {
+			return true;
+		}
+		
+		// Else for every parent of current node
+		List<Node> parents = currentNode.getParents();
+		for(Node parent : parents) {
+			// Recurse
+			boolean result = checkValidRecursively(checkNode, parent);
+			
+			// If value returned was false return false
+			if(result == false) {
+				return false;
+			}
+		}
+		
+		// If we make it here then every parent was checked
+		return true;
 	}
 	
 	

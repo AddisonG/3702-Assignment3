@@ -24,5 +24,10 @@ public class Edge {
 	public Node getChild() {
 		return node2;
 	}
+	
+	public Double getWeight() {
+		// TODO
+		return (double) 0;
+	}
 
 }

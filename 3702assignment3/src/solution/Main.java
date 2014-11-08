@@ -1,8 +1,7 @@
 package solution;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Main class for starting and running the program.
@@ -26,11 +25,14 @@ public class Main extends Global {
 		String filepath = "data/" + filename + ".txt";
 		String mode = args[1];
 		
-		// Create Bayesian Network from file
-		BayesianNetwork bayonet = Reader.readFile(filepath);
+		BayesianNetwork bayonet;
 		
 		switch (mode) {
 			case "task1":			// Create file that calculates CPT of each node
+				
+				// Create Bayesian Network from file
+				bayonet = Reader.readFile(filepath);
+				
 				filename = "cpt-" + filename + ".txt";
 				try {
 					Writer.writeCPT(filename, bayonet);
@@ -42,12 +44,27 @@ public class Main extends Global {
 				break;
 				
 			case "task2":			// Outputs the likelihood and log likelihood of given data
+				
+				// Create Bayesian Network from file
+				bayonet = Reader.readFile(filepath);
+				
 				printLikelihoods(bayonet);
 				break;
 				
 			case "task4":			// Create file that has CPT data when no parents are given
-				bayonet = createDAGs(bayonet);
-				//TODO write new bayonet to file
+				
+				// Create Bayesian Network from file
+				bayonet = Reader.readFileNoParents(filepath);
+				
+				bayonet = createDAG(bayonet);
+				filename = "bn-" + filename + ".txt";
+				try {
+					Writer.writeDAG(filename, bayonet);
+				} catch(IOException e) {
+					log(ERROR, "Error Writing File!");
+					e.printStackTrace();
+					System.exit(1);
+				}
 				break;
 				
 			// add more cases, as above
@@ -67,7 +84,7 @@ public class Main extends Global {
 	
 	
 	/**
-	 * Creates the DAGs, appropriately setting the parents
+	 * Creates the DAG, appropriately setting the parents
 	 * for nodes on a data set that does not give node parents.
 	 * 
 	 * This is used for task 4
@@ -76,20 +93,23 @@ public class Main extends Global {
 	 * 
 	 * @return the new network with edges between nodes
 	 */
-	public static BayesianNetwork createDAGs(BayesianNetwork bayonet) {
+	public static BayesianNetwork createDAG(BayesianNetwork bayonet) {
 		
 		// Create fully connected graph G
-		bayonet = createFullDAG(bayonet);
+		//bayonet = createFullDAG(bayonet);
 		
 		// Create minimum weight spanning tree
-		bayonet = createMinimumSpanningTree(bayonet);
+		//bayonet = createMinimumSpanningTree(bayonet);
+		
+		// Create naive DAG while spanning doesnt work
+		bayonet = createNaiveDAG(bayonet);
 		
 		// While time taken < 3 minutes
 		// TODO use a timer or something here?
 		int time = 0; // This is just temporary, so it doesnt loop infinitely
 		while(time < 10000) {
 		
-			double bestScore = 0; // TODO bayonet.calculateScore();
+			double bestScore = bayonet.calculateScore();
 			BayesianNetwork bestNetwork = bayonet;
 		
 			// Possible actions: create an edge (each pair of nodes), remove an edge from list, change direction of edge
@@ -122,17 +142,20 @@ public class Main extends Global {
 				
 						// Add the edge to the network
 						tempNetwork.addEdge(newEdge);
+						
+						// Check DAG is still valid
+						if(tempNetwork.checkValidDAG()) {
 				
-						// Calculate the score
-						double score = 0;
-						//TODO
-				
-						// If score is better
-						if(score > bestScore) {
-				
-							// Set this as new best network
-							bestScore = score;
-							bestNetwork = tempNetwork;
+							// Calculate the score
+							double score = tempNetwork.calculateScore();
+					
+							// If score is better
+							if(score > bestScore) {
+					
+								// Set this as new best network
+								bestScore = score;
+								bestNetwork = tempNetwork;
+							}
 						}
 					}
 				}
@@ -150,14 +173,18 @@ public class Main extends Global {
 				// remove the edge from copy
 				tempNetwork.removeEdge(edges.get(i));
 				
-				double score = 0; //TODO
-			
-				// Calculate if score is better
-				if(score > bestScore) {
-			
-					// Set this as new best network
-					bestScore = score;
-					bestNetwork = tempNetwork;
+				// Check DAG is still valid
+				if(tempNetwork.checkValidDAG()) {
+				
+					double score = tempNetwork.calculateScore();
+				
+					// Calculate if score is better
+					if(score > bestScore) {
+				
+						// Set this as new best network
+						bestScore = score;
+						bestNetwork = tempNetwork;
+					}
 				}
 			}
 			
@@ -171,17 +198,21 @@ public class Main extends Global {
 				// Copy the  bayonet
 				BayesianNetwork tempNetwork = new BayesianNetwork(bayonet);
 			
-				// remove the edge from copy
+				// reverse the edge from copy
 				tempNetwork.reverseEdge(edges.get(i));
 				
-				double score = 0; //TODO
-			
-				// Calculate if score is better
-				if(score > bestScore) {
-			
-					// Set this as new best network
-					bestScore = score;
-					bestNetwork = tempNetwork;
+				// Check DAG is valid
+				if(tempNetwork.checkValidDAG()) {
+				
+					double score = tempNetwork.calculateScore();
+				
+					// Calculate if score is better
+					if(score > bestScore) {
+				
+						// Set this as new best network
+						bestScore = score;
+						bestNetwork = tempNetwork;
+					}
 				}
 			}
 			
@@ -204,33 +235,85 @@ public class Main extends Global {
 	public static BayesianNetwork createFullDAG(BayesianNetwork bayonet) {
 		
 		// For each node
+		Map<String, Node> nodes = bayonet.getNodes();
+		for (Map.Entry<String, Node> nodeElement : nodes.entrySet()) {
+			
+			Node node1 = nodeElement.getValue();
 		
 			// For each following node
+			for (Map.Entry<String, Node> nodeElement2 : nodes.entrySet()) {
+				
+				Node node2 = nodeElement2.getValue();
 		
 				// Create a new edge between the two nodes
+				Edge newEdge = new Edge(node1, node2);
+				bayonet.addEdge(newEdge);
+			}
+		}
 		
 		return bayonet;
 	}
 	
 	
+	public static BayesianNetwork createNaiveDAG(BayesianNetwork bayonet) {
+		
+		// Get first node in network
+		Map<String, Node> nodes = bayonet.getNodes();
+		for (Map.Entry<String, Node> nodeElement : nodes.entrySet()) {
+			
+			Node node1 = nodeElement.getValue();
+		
+			// Add all other nodes as parents
+			for (Map.Entry<String, Node> nodeElement2 : nodes.entrySet()) {
+				Node node2 = nodeElement2.getValue();
+				bayonet.addEdge(new Edge(node1, node2));
+			}
+			return bayonet;
+		}
+		return bayonet;
+	}
+	
+	
+	@SuppressWarnings("null")
 	public static BayesianNetwork createMinimumSpanningTree(BayesianNetwork bayonet) {
 		
-		// Create empty list of nodes
+		// Create empty Map of nodes
+		Map<String, Node> nodes = null;
 		
 		// Create empty list of edges
+		ArrayList<Edge> newEdges = new ArrayList<Edge>();
+		List<Edge> edges = bayonet.getEdges();
 		
 		// Sort list of edges by smallest weight
+		Collections.sort(edges, new Comparator<Edge>() {
+			@Override
+			public int compare(Edge edge1, Edge edge2) {
+				return edge1.getWeight().compareTo(edge2.getWeight());
+			}
+		});
 		
 		// For each edge in ascending order
+		for(Edge edge : edges) {
 		
 			// If both nodes on edge are not in list of nodes
+			if(!nodes.containsValue(edge.getParent()) && !nodes.containsValue(edge.getChild())) {
 		
 				// Add edge to new list
+				newEdges.add(edge);
 		
 				// Add each node to node list
+				if(!nodes.containsValue(edge.getParent())) {
+					nodes.put(edge.getParent().getName(), edge.getParent());
+				}
+				
+				if(!nodes.containsValue(edge.getChild())) {
+					nodes.put(edge.getChild().getName(), edge.getChild());
+				}
+			}
+		}
 		
 		// Set edges of network to new edge list
-		
+		bayonet.setEdges(newEdges);
 	
 		return bayonet;
 	}
