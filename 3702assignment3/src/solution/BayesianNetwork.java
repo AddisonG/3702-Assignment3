@@ -50,7 +50,13 @@ public class BayesianNetwork extends Global {
 		// Copy all of the nodes over
 		for (Map.Entry<String, Node> nodeElement : newNodes.entrySet()) {
 			String name = nodeElement.getKey();
-			Node newNode = new Node(name);
+			Node oldNode = nodeElement.getValue();
+			
+			Node newNode = new Node(name.toString());
+			
+			for(Node parent : oldNode.getParents()) {
+				newNode.addParent(parent);
+			}
 			
 			this.nodes.put(name, newNode);
 		}
@@ -426,22 +432,21 @@ public class BayesianNetwork extends Global {
 	}
 	
 	
-	public void addEdge(Edge edge) {
+	public boolean addEdge(Edge edge) {
 		// Check edge isn't already in list of edges
 		for(Edge existingEdge : edges) {
 			
 			if((edge.getChild().equals(existingEdge.getChild()) && edge.getParent().equals(existingEdge.getParent())) ||
-					edge.getChild().equals(existingEdge.getParent()) && edge.getParent().equals(existingEdge.getChild())) {
+					(edge.getChild().equals(existingEdge.getParent()) && edge.getParent().equals(existingEdge.getChild()))) {
 				// Edge already exists!
-				return;
+				log(INFO, "Tried adding invalid edge");
+				return false;
 			}
 			
 		}
 		
 		
 		if(!edges.contains(edge)) {
-			
-			log(INFO, "Adding Edge " + edge.getParent() + ", " + edge.getChild());
 		
 			// Add edge to list of edges
 			edges.add(edge);
@@ -452,6 +457,7 @@ public class BayesianNetwork extends Global {
 			child.addParent(parent);
 			
 		}
+		return true;
 	}
 	
 	public void removeEdge(Edge edge) {
@@ -518,13 +524,10 @@ public class BayesianNetwork extends Global {
 		for (Map.Entry<String, Node> nodeElement : nodes.entrySet()) {	
 			
 			Node node = nodeElement.getValue();
-			log(INFO, "Checking validity of " + node);
 			List<Node> parents = node.getParents();
 		
 			// For each parent of node
 			for(Node parent : parents) {
-				
-				log(INFO, "Checking validity of " + node + " with " + parent);
 		
 				// Recursively check DAG is valid
 				boolean result = checkValidRecursively(node, parent);
@@ -582,7 +585,29 @@ public class BayesianNetwork extends Global {
 	
 	
 	
+	public boolean equals(BayesianNetwork other) {
+		if(other.getNodes() != nodes) {
+			return false;
+		}
+		
+		if(data != other.getData()) {
+			return false;
+		}
+		
+		if(edges != other.getEdges()) {
+			return false;
+		}
+		
+		return true;
+	}
 	
+	
+	
+	public List<List<Boolean>> getData() {
+		return data;
+	}
+
+
 	private static void log(int mode, String str) {
 		if (MODE >= mode) {
 			System.out.println(str);

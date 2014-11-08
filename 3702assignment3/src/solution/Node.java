@@ -92,7 +92,6 @@ public class Node {
 		return this.name;
 	}
 	
-	
 	public boolean equals(Node node) {
 		if (this.getName().equals(node.getName())) {
 			return true;

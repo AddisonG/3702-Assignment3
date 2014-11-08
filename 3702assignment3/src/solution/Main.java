@@ -106,12 +106,11 @@ public class Main extends Global {
 		
 		// While time taken < 2 mins, 55 seconds
 		long startTime = System.currentTimeMillis();
-		while((System.currentTimeMillis() - startTime) < 1000 * 175) {
+		while((System.currentTimeMillis() - startTime) < 1000 * 17.5) {
 		
+			boolean changed = false;
 			double bestScore = bayonet.calculateScore();
-			BayesianNetwork bestNetwork = bayonet;
-			
-			bayonet.checkValidDAG();
+			BayesianNetwork bestNetwork = new BayesianNetwork(bayonet);
 		
 			// Possible actions: create an edge (each pair of nodes), remove an edge from list, change direction of edge
 		
@@ -142,20 +141,30 @@ public class Main extends Global {
 						Edge newEdge = new Edge(node1, node2);
 				
 						// Add the edge to the network
-						tempNetwork.addEdge(newEdge);
+						if(tempNetwork.addEdge(newEdge)) {
 						
-						// Check DAG is still valid
-						if(tempNetwork.checkValidDAG()) {
-				
-							// Calculate the score
-							double score = tempNetwork.calculateScore();
+							log(INFO, "Tried adding new edge " + node1 + ", " + node2);
+							
+							// Check DAG is still valid
+							if(tempNetwork.checkValidDAG()) {
 					
-							// If score is better
-							if(score > bestScore) {
-					
-								// Set this as new best network
-								bestScore = score;
-								bestNetwork = tempNetwork;
+								// Calculate the score
+								double score = tempNetwork.calculateScore();
+								
+								log(INFO, "Old score is " + bestScore + ", new score is " + score);
+						
+								// If score is better
+								if(score > bestScore) {
+									
+									log(INFO, "New best score! Added edge " + node1 + ", " + node2);
+						
+									// Set this as new best network
+									bestScore = score;
+									bestNetwork = new BayesianNetwork(tempNetwork);
+									changed = true;
+								}
+							} else {
+								log(INFO, "New edge was invalid");
 							}
 						}
 					}
@@ -184,7 +193,8 @@ public class Main extends Global {
 				
 						// Set this as new best network
 						bestScore = score;
-						bestNetwork = tempNetwork;
+						bestNetwork = new BayesianNetwork(tempNetwork);
+						changed = true;
 					}
 				}
 			}
@@ -212,14 +222,16 @@ public class Main extends Global {
 				
 						// Set this as new best network
 						bestScore = score;
-						bestNetwork = tempNetwork;
+						bestNetwork = new BayesianNetwork(tempNetwork);
+						changed = true;
 					}
 				}
 			}
 			
 		
 			// If network didn't change, return
-			if(bestNetwork.equals(bayonet)) {
+			if(!changed) {
+				log(INFO, "Optimal network found");
 				return bayonet;
 				
 			} else {
