@@ -1,0 +1,13 @@
+A
+B
+C
+D
+A
+0.498
+B
+0.46
+C
+0.512
+D
+0.444
+-Infinity -Infinity
