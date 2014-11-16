@@ -454,6 +454,10 @@ public class BayesianNetwork extends Global {
 		return likelihood;
 	}
 	
+	public void removeEdges() {
+		edges = new ArrayList<Edge>();
+	}
+	
 	
 
 	public double calculateLogLikelihood() {

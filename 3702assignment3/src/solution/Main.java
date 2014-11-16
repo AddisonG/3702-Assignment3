@@ -87,13 +87,24 @@ public class Main extends Global {
 	 * Creates the DAG, appropriately setting the parents
 	 * for nodes on a data set that does not give node parents.
 	 * 
-	 * This is used for task 4
-	 * 
 	 * @param bayonet - The network of nodes and data with no node relationships
 	 * 
 	 * @return the new network with edges between nodes
 	 */
 	public static BayesianNetwork createDAG(BayesianNetwork bayonet) {
+		
+		
+		//TODO create no edge (literally no edges)
+		bayonet = createNoEdgeDAG(bayonet);
+		
+		// TODO create random chain (don't know what that is)
+		
+		// TODO create best tree network (figure it out)
+		
+		// If task 6, create no edge and random chain
+		
+		// If task 7, create best tree network
+		
 		
 		// Create fully connected graph G
 		//bayonet = createFullDAG(bayonet);
@@ -311,6 +322,25 @@ public class Main extends Global {
 			}
 		}
 		
+		return bayonet;
+	}
+	
+	
+	public static BayesianNetwork createNoEdgeDAG(BayesianNetwork bayonet) {
+		// For each node
+		Map<String, Node> nodes = bayonet.getNodes();
+		for (Map.Entry<String, Node> nodeElement : nodes.entrySet()) {
+			
+			Node node = nodeElement.getValue();
+			
+			// Remove all parents from node
+			node.removeAllParents();
+			
+			// empty list of edges
+			bayonet.removeEdges();
+		}
+		
+		// return the network
 		return bayonet;
 	}
 	
