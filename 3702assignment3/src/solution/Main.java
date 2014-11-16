@@ -102,15 +102,20 @@ public class Main extends Global {
 		//bayonet = createMinimumSpanningTree(bayonet);
 		
 		// Create naive DAG while spanning doesnt work
-		bayonet = createNaiveDAG(bayonet);
+		//bayonet = createNaiveDAG(bayonet);
 		
 		// While time taken < 2 mins, 55 seconds
 		long startTime = System.currentTimeMillis();
-		while((System.currentTimeMillis() - startTime) < 1000 * 17.5) {
+		double bestScore = -2500; // Really low number
+		while((System.currentTimeMillis() - startTime) < 1000 * 175) {
+			
+			log(INFO, "\n\n");
+			
+			
+			
 		
 			boolean changed = false;
 			BayesianNetwork bestNetwork = new BayesianNetwork(bayonet);
-			double bestScore = bayonet.calculateScore();
 		
 			// Possible actions: create an edge (each pair of nodes), remove an edge from list, change direction of edge
 		
@@ -118,6 +123,18 @@ public class Main extends Global {
 			
 			Map<String, Node> nodes = bayonet.getNodes();
 			List<Edge> edges = bayonet.getEdges();
+			
+			for (Map.Entry<String, Node> nodeElement : nodes.entrySet()) {
+				
+				Node node = nodeElement.getValue();
+				
+				String debugStr = node.getName() + ": ";
+				for(Node ancestor : node.getAncestors()) {
+					debugStr += ancestor.toString();
+				}
+				log(INFO, debugStr + "\n");
+			}
+			
 			
 			// Add action
 			
@@ -136,8 +153,6 @@ public class Main extends Global {
 			
 						// Copy bayonet
 						BayesianNetwork tempNetwork = new BayesianNetwork(bayonet);
-						
-						// Here's the problem. Its creating a new edge with the nodes from the previous network
 						
 						// Get the equivalent nodes from the new network so not updating the same nodes
 						Node newNode1 = tempNetwork.getNodeByName(node1.getName());
@@ -185,18 +200,26 @@ public class Main extends Global {
 			
 				// Copy the  bayonet
 				BayesianNetwork tempNetwork = new BayesianNetwork(bayonet);
+				
+				// Get equivalent edge in new network
+				Edge newEdge = tempNetwork.getEquivalentEdge(edges.get(i));
 			
 				// remove the edge from copy
-				tempNetwork.removeEdge(edges.get(i));
+				tempNetwork.removeEdge(newEdge);
+				
+				log(INFO, "Tried removing edge " + newEdge.getParent() + ", " + newEdge.getChild());
 				
 				// Check DAG is still valid
 				if(tempNetwork.checkValidDAG()) {
 				
 					double score = tempNetwork.calculateScore();
+					
+					log(INFO, "Old score is " + bestScore + ", new score is " + score);
 				
 					// Calculate if score is better
 					if(score > bestScore) {
-				
+						
+						log(INFO, "New best score");
 						// Set this as new best network
 						bestScore = score;
 						bestNetwork = new BayesianNetwork(tempNetwork);
@@ -214,18 +237,26 @@ public class Main extends Global {
 				
 				// Copy the  bayonet
 				BayesianNetwork tempNetwork = new BayesianNetwork(bayonet);
+				
+				// Get equivalent edge in new network
+				Edge newEdge = tempNetwork.getEquivalentEdge(edges.get(i));
+				
+				log(INFO, "Tried reversing edge " + newEdge.getParent() + ", " + newEdge.getChild());
 			
 				// reverse the edge from copy
-				tempNetwork.reverseEdge(edges.get(i));
+				tempNetwork.reverseEdge(newEdge);
 				
 				// Check DAG is valid
 				if(tempNetwork.checkValidDAG()) {
 				
 					double score = tempNetwork.calculateScore();
+					
+					log(INFO, "Old score is " + bestScore + ", new score is " + score);
 				
 					// Calculate if score is better
 					if(score > bestScore) {
 				
+						log(INFO, "New best score, edge is now reverse");
 						// Set this as new best network
 						bestScore = score;
 						bestNetwork = new BayesianNetwork(tempNetwork);
@@ -253,20 +284,30 @@ public class Main extends Global {
 	
 	public static BayesianNetwork createFullDAG(BayesianNetwork bayonet) {
 		
+		log(INFO, "Creating DAG");
+		
 		// For each node
 		Map<String, Node> nodes = bayonet.getNodes();
 		for (Map.Entry<String, Node> nodeElement : nodes.entrySet()) {
 			
 			Node node1 = nodeElement.getValue();
+			
+			log(INFO, "Node 1 is " + node1);
 		
 			// For each following node
 			for (Map.Entry<String, Node> nodeElement2 : nodes.entrySet()) {
 				
 				Node node2 = nodeElement2.getValue();
+				
+				log(INFO, "Node 2 is " + node2);
+				
+				if(!node1.equals(node2)) {
 		
-				// Create a new edge between the two nodes
-				Edge newEdge = new Edge(node1, node2);
-				bayonet.addEdge(newEdge);
+					// Create a new edge between the two nodes
+					Edge newEdge = new Edge(node1, node2);
+					bayonet.addEdge(newEdge);
+					log(INFO, "Added edge");
+				}
 			}
 		}
 		

@@ -38,6 +38,8 @@ public class BayesianNetwork extends Global {
 	 */
 	public BayesianNetwork(BayesianNetwork bayonet) {
 		
+		log(DEBUG, "\nCreated new network");
+		
 		// Initialize lists
 		nodes = new HashMap<String, Node>((int)Math.ceil(bayonet.getNodes().size() / 0.75));
 		data = new ArrayList<List<Boolean>>();
@@ -69,7 +71,20 @@ public class BayesianNetwork extends Global {
 			Edge newEdge = new Edge(newNode1, newNode2);
 			
 			// Add new edge to list of edges
-			edges.add(newEdge);
+			addEdge(newEdge);
+		}
+		
+		
+		
+		for (Map.Entry<String, Node> nodeElement : nodes.entrySet()) {
+			
+			Node node = nodeElement.getValue();
+			
+			String debugStr = node.getName() + ": ";
+			for(Node ancestor : node.getAncestors()) {
+				debugStr += ancestor.toString();
+			}
+			log(DEBUG, debugStr);
 		}
 	}
 	
@@ -87,6 +102,30 @@ public class BayesianNetwork extends Global {
 	
 	public Node getNodeByName(String name) {
 		return nodes.get(name);
+	}
+	
+	
+	public Edge getEquivalentEdge(Edge oldEdge) {
+		// Get name of each node in old edge
+		String oldEdgeParent = oldEdge.getParent().getName();
+		String oldEdgeChild = oldEdge.getChild().getName();
+		
+		Node parent = nodes.get(oldEdgeParent);
+		Node child = nodes.get(oldEdgeChild);
+		
+		// For each edge
+		for (Edge edge : edges) {
+		
+			// If edge has same nodes as given edge
+			if(edge.getChild().equals(child) && edge.getParent().equals(parent)) {
+		
+				// Return edge
+				return edge;
+			}
+		}
+		
+		// Return null if no edge found
+		return null;
 	}
 	
 	
@@ -442,6 +481,8 @@ public class BayesianNetwork extends Global {
 		
 		
 		if(!edges.contains(edge)) {
+			
+			log(DEBUG, "Added edge to network");
 		
 			// Add edge to list of edges
 			edges.add(edge);
@@ -501,6 +542,7 @@ public class BayesianNetwork extends Global {
 			
 			// Add the edge with nodes swapped
 			addEdge(newEdge);
+			//log(INFO, "Added Edge: " + newEdge.toString());
 		}
 	}
 	

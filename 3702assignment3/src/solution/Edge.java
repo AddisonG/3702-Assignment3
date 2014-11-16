@@ -42,4 +42,8 @@ public class Edge {
 		}
 		return false;
 	}
+	
+	public String toString() {
+		return node1.getName() + node2.getName();
+	}
 }

@@ -89,6 +89,7 @@ public class Node {
 	 */
 	public List<Node> getAncestors() {
 		List<Node> ancestors = new ArrayList<Node>();
+		ancestors.add(this);
 		
 		// recursion
 		for (Node parent : parents) {
