@@ -109,8 +109,8 @@ public class Main extends Global {
 		while((System.currentTimeMillis() - startTime) < 1000 * 17.5) {
 		
 			boolean changed = false;
-			double bestScore = bayonet.calculateScore();
 			BayesianNetwork bestNetwork = new BayesianNetwork(bayonet);
+			double bestScore = bayonet.calculateScore();
 		
 			// Possible actions: create an edge (each pair of nodes), remove an edge from list, change direction of edge
 		
@@ -136,14 +136,20 @@ public class Main extends Global {
 			
 						// Copy bayonet
 						BayesianNetwork tempNetwork = new BayesianNetwork(bayonet);
+						
+						// Here's the problem. Its creating a new edge with the nodes from the previous network
+						
+						// Get the equivalent nodes from the new network so not updating the same nodes
+						Node newNode1 = tempNetwork.getNodeByName(node1.getName());
+						Node newNode2 = tempNetwork.getNodeByName(node2.getName());
 				
 						// Create edge between these nodes
-						Edge newEdge = new Edge(node1, node2);
+						Edge newEdge = new Edge(newNode1, newNode2);
 				
 						// Add the edge to the network
 						if(tempNetwork.addEdge(newEdge)) {
 						
-							log(INFO, "Tried adding new edge " + node1 + ", " + node2);
+							log(INFO, "Tried adding new edge " + newNode1 + ", " + newNode2);
 							
 							// Check DAG is still valid
 							if(tempNetwork.checkValidDAG()) {

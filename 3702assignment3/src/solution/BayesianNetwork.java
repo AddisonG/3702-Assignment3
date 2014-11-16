@@ -85,6 +85,11 @@ public class BayesianNetwork extends Global {
 	}
 	
 	
+	public Node getNodeByName(String name) {
+		return nodes.get(name);
+	}
+	
+	
 	/**
 	 * Returns the amount of rows where everything in true list is true
 	 * and everything in false list is false
