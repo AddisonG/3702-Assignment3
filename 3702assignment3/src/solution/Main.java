@@ -56,7 +56,22 @@ public class Main extends Global {
 				// Create Bayesian Network from file
 				bayonet = Reader.readFileNoParents(filepath);
 				
-				bayonet = createDAG(bayonet);
+				bayonet = createDAG(bayonet, mode);
+				filename = "bn-" + filename + ".txt";
+				try {
+					Writer.writeDAG(filename, bayonet);
+				} catch(IOException e) {
+					log(ERROR, "Error Writing File!");
+					e.printStackTrace();
+					System.exit(1);
+				}
+				break;
+			case "task7":			// Create file that has CPT data when no parents are given
+				
+				// Create Bayesian Network from file
+				bayonet = Reader.readFileNoParents(filepath);
+				
+				bayonet = createDAG(bayonet, mode);
 				filename = "bn-" + filename + ".txt";
 				try {
 					Writer.writeDAG(filename, bayonet);
@@ -91,29 +106,20 @@ public class Main extends Global {
 	 * 
 	 * @return the new network with edges between nodes
 	 */
-	public static BayesianNetwork createDAG(BayesianNetwork bayonet) {
+	public static BayesianNetwork createDAG(BayesianNetwork bayonet, String mode) {
 		
+		log(INFO, mode);
 		
-		//TODO create no edge (literally no edges)
+		// create no edge (Note this is initialization for task6 as well)
 		bayonet = createNoEdgeDAG(bayonet);
 		
-		// TODO create random chain (don't know what that is)
-		
-		// TODO create best tree network (figure it out)
-		
-		// If task 6, create no edge and random chain
-		
 		// If task 7, create best tree network
-		
-		
-		// Create fully connected graph G
-		//bayonet = createFullDAG(bayonet);
-		
-		// Create minimum weight spanning tree
-		//bayonet = createMinimumSpanningTree(bayonet);
-		
-		// Create naive DAG while spanning doesnt work
-		//bayonet = createNaiveDAG(bayonet);
+		if(mode.equals("task7")) {
+			log(INFO, "Creating full DAG");
+			bayonet = createFullDAG(bayonet);
+			log(INFO, "Creating spanning tree");
+			bayonet = createMinimumSpanningTree(bayonet);
+		}
 		
 		// While time taken < 2 mins, 55 seconds
 		long startTime = System.currentTimeMillis();
@@ -293,6 +299,12 @@ public class Main extends Global {
 	}
 	
 	
+	/**
+	 * Creates a complete graph with an edge from every node to every node
+	 * 
+	 * @param bayonet
+	 * @return
+	 */
 	public static BayesianNetwork createFullDAG(BayesianNetwork bayonet) {
 		
 		log(INFO, "Creating DAG");
@@ -305,7 +317,7 @@ public class Main extends Global {
 			
 			log(INFO, "Node 1 is " + node1);
 		
-			// For each following node
+			// For each other node
 			for (Map.Entry<String, Node> nodeElement2 : nodes.entrySet()) {
 				
 				Node node2 = nodeElement2.getValue();
@@ -367,21 +379,24 @@ public class Main extends Global {
 	}
 	
 	
-	@SuppressWarnings("null")
-	public static BayesianNetwork createMinimumSpanningTree(BayesianNetwork bayonet) {
+	public static BayesianNetwork createMinimumSpanningTree(final BayesianNetwork bayonet) {
 		
 		// Create empty Map of nodes
-		Map<String, Node> nodes = null;
+		Map<String, Node> nodes = new HashMap<String, Node>();
 		
 		// Create empty list of edges
 		ArrayList<Edge> newEdges = new ArrayList<Edge>();
 		List<Edge> edges = bayonet.getEdges();
 		
+		log(INFO, edges.size() + "");
+		
 		// Sort list of edges by smallest weight
 		Collections.sort(edges, new Comparator<Edge>() {
 			@Override
 			public int compare(Edge edge1, Edge edge2) {
-				return edge1.getWeight().compareTo(edge2.getWeight());
+				Double weight1 = bayonet.getWeight(edge1.getParent(), edge1.getChild());
+				Double weight2 = bayonet.getWeight(edge1.getParent(), edge1.getChild());
+				return (weight1.compareTo(weight2));
 			}
 		});
 		
@@ -391,23 +406,31 @@ public class Main extends Global {
 		for(Edge edge : edges) {
 		
 			// If both nodes on edge are not in list of nodes
-			if(!nodes.containsValue(edge.getParent()) && !nodes.containsValue(edge.getChild())) {
+			if(nodes.isEmpty() || !(nodes.containsValue(edge.getParent()) && nodes.containsValue(edge.getChild()))) {
 		
+				
+				log(DEBUG, "Adding edge " + edge);
 				// Add edge to new list
 				newEdges.add(edge);
+				
+				
+				
 		
 				// Add each node to node list
 				if(!nodes.containsValue(edge.getParent())) {
+					log(DEBUG, "Adding Node " + edge.getParent());
 					nodes.put(edge.getParent().getName(), edge.getParent());
 				}
 				
 				if(!nodes.containsValue(edge.getChild())) {
+					log(DEBUG, "Adding node " + edge.getChild());
 					nodes.put(edge.getChild().getName(), edge.getChild());
 				}
 			}
 		}
 		
 		// Set edges of network to new edge list
+		bayonet.removeEdges();
 		bayonet.setEdges(newEdges);
 	
 		return bayonet;
