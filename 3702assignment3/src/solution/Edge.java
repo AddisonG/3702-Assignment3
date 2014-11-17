@@ -8,7 +8,6 @@ package solution;
  */
 public class Edge {
 	
-	private double weight;	// The weight of this edge (from mutual inclusion)
 	private Node node1;		// The node this edge comes from
 	private Node node2; 	// The node this edge goes to
 	
@@ -31,10 +30,7 @@ public class Edge {
 	public Node getChild() {
 		return node2;
 	}
-	
-	public Double getWeight() {
-		return weight;
-	}
+
 	
 	public boolean equals(Edge edge) {
 		if (node1.getName().equals(edge.getParent().getName()) && node2.getName().equals(edge.getChild().getName())) {

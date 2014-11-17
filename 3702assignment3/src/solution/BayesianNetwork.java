@@ -140,8 +140,6 @@ public class BayesianNetwork extends Global {
 		
 		log(DEBUG, " ");
 		log(DEBUG, "Calculating boolean data");
-		log(DEBUG, "Truelist: " + trueList.toString());
-		log(DEBUG, "Falselist " + falseList.toString());
 		
 		if (data.size() == 0) {
 			log(ERROR, "ERROR: No data found");
@@ -262,11 +260,13 @@ public class BayesianNetwork extends Global {
 	}
 	
 	
-	private double getProbability(ArrayList<Node> trueList, List<Node> falseList) {
+	private double getProbability(ArrayList<Node> trueList, ArrayList<Node> falseList) {
 		
 		@SuppressWarnings("unchecked")
 		ArrayList<Node> temp = (ArrayList<Node>) trueList.clone();
-		temp.remove(0);
+		if(temp.size() > 0) {
+			temp.remove(0);
+		}
 		
 		// Calculate the amount of data for these lists
 		double count = countBooleanData(trueList, falseList);
@@ -465,6 +465,75 @@ public class BayesianNetwork extends Global {
 	public double calculateScore() {
 		double c = 1; // constant value
 		return calculateLogLikelihood() - (c * data.size());
+	}
+	
+	/**
+	 * My interpretation of how to get weights using mutual inclusion.
+	 * 
+	 * This method is very poorly written and may not be correct I don't know
+	 * 
+	 * @param node1
+	 * @param node2
+	 * @return
+	 */
+	public double getWeight(Node node1, Node node2) {
+		double weight = 0;
+		
+		log(INFO, "getting weight");
+		
+		// list only with each node for getting individual probabilities
+		ArrayList<Node> aList = new ArrayList<Node>();
+		aList.add(node1);
+		ArrayList<Node> bList = new ArrayList<Node>();
+		bList.add(node2);
+		
+		log(INFO, "Getting A prob");
+		// get individual probabilities so not recalculating all the time
+		double aTrueProb = getProbability(aList, new ArrayList<Node>());
+		double aFalseProb = getProbability(new ArrayList<Node>(), aList);
+		log(INFO, "getting b probability");
+		double bTrueProb = getProbability(bList, new ArrayList<Node>());
+		double bFalseProb = getProbability(new ArrayList<Node>(), bList);
+		
+		log(INFO, "Trying TT");
+		
+		// TT
+		ArrayList<Node> trueList = new ArrayList<Node>();
+		ArrayList<Node> falseList = new ArrayList<Node>();
+		trueList.add(node1);
+		trueList.add(node2);
+		double probability1 = getProbability(trueList, falseList);
+		double probability2 = (probability1 / (aTrueProb * bTrueProb));
+		weight += (probability1 * Math.log(probability2));
+		
+		// FF
+		trueList = new ArrayList<Node>();
+		falseList = new ArrayList<Node>();
+		falseList.add(node1);
+		falseList.add(node2);
+		probability1 = getProbability(trueList, falseList);
+		probability2 = (probability1 / (aFalseProb * bFalseProb));
+		weight += (probability1 * Math.log(probability2));
+		
+		// TF
+		trueList = new ArrayList<Node>();
+		falseList = new ArrayList<Node>();
+		trueList.add(node1);
+		falseList.add(node2);
+		probability1 = getProbability(trueList, falseList);
+		probability2 = (probability1 / (aTrueProb * bFalseProb));
+		weight += (probability1 * Math.log(probability2));
+		
+		// FT
+		trueList = new ArrayList<Node>();
+		falseList = new ArrayList<Node>();
+		falseList.add(node1);
+		trueList.add(node2);
+		probability1 = getProbability(trueList, falseList);
+		probability2 = (probability1 / (aFalseProb * bTrueProb));
+		weight += (probability1 * Math.log(probability2));
+		
+		return weight;
 	}
 	
 	public boolean addEdge(Edge edge) {
