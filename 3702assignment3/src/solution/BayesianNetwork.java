@@ -458,17 +458,14 @@ public class BayesianNetwork extends Global {
 		edges = new ArrayList<Edge>();
 	}
 	
-	
-
 	public double calculateLogLikelihood() {
 		return Math.log(calculateMaximumLikelihood());
 	}
 	
 	public double calculateScore() {
-		int c = 1; // constant value
+		double c = 1; // constant value
 		return calculateLogLikelihood() - (c * data.size());
 	}
-	
 	
 	public boolean addEdge(Edge edge) {
 		// Check edge isn't already in list of edges
